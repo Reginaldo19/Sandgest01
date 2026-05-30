@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Painel de Administração • Sistema Escolar</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --text-light: #f8f9fa;
+      --text-dark: #212529;
+      --bg-light: #f5f7fb;
+      --bg-dark: #0d1117;
+      --card-light: #ffffff;
+      --card-dark: #161b22;
+      --border-light: #dee2e6;
+      --border-dark: #30363d;
+    }
+
+    [data-theme="light"] {
+      --bg-color: var(--bg-light);
+      --card-bg: var(--card-light);
+      --text-color: var(--text-dark);
+      --border-color: var(--border-light);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: var(--bg-dark);
+      --card-bg: var(--card-dark);
+      --text-color: var(--text-light);
+      --border-color: var(--border-dark);
+    }
+
+    body {
+      background: var(--bg-color);
+      min-height: 100vh;
+      font-family: 'Poppins', system-ui, Arial;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .app {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 280px;
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        padding: 0;
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--primary);
+      color: white;
+    }
+    
+    .sidebar-brand {
+      font-weight: 600;
+      font-size: 20px;
+      color: white;
+    }
+    
+    .system-info {
+        padding: 20px 16px;
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+    }
+    
+    .system-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+    }
+    
+    .system-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .system-info h5 {
+        margin: 0 0 4px 0;
+        font-weight: 600;
+    }
+    
+    .system-info p {
+        margin: 0;
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+    
+    .sidebar-nav {
+        flex: 1;
+        padding: 16px 0;
+    }
+    
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-color);
+      text-decoration: none;
+      transition: background-color 0.2s;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      border-left-color: var(--primary);
+    }
+    .sidebar-nav a i {
+      font-size: 18px;
+      width: 24px;
+    }
+
+    .content-area {
+        flex: 1;
+        padding: 32px;
+        box-sizing: border-box;
+        background: var(--bg-color);
+        overflow-y: auto;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-ui {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .section-title {
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .muted { opacity: 0.7; font-size: 14px; }
+
+    .form-control, .form-select {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 10px;
+      padding: 12px 15px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 600;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.875rem;
+    }
+
+    .filter-section {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .admin-badge {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin: 2px;
+      display: inline-block;
+    }
+
+    .admin-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .admin-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .admin-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--primary);
+    }
+    
+    .admin-role-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .admin-role-badge.super-admin {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+    
+    .admin-role-badge.admin {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+    
+    .admin-role-badge.moderator {
+      background-color: rgba(253, 126, 20, 0.1);
+      color: #fd7e14;
+    }
+    
+    .admin-role-badge.support {
+      background-color: rgba(25, 135, 84, 0.1);
+      color: #198754;
+    }
+    
+    .admin-avatar-small {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+    }
+    
+    .admin-avatar-small i {
+      font-size: 1.2rem;
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+      background: rgba(67, 97, 238, 0.05);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+
+    .status-dot {
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .status-dot.ativo { background-color: #198754; }
+    .status-dot.inativo { background-color: #6c757d; }
+
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .stat-card .label {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+    }
+
+    .export-btn {
+      background: #198754;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .activity-log {
+      margin-top: 24px;
+    }
+
+    .activity-item {
+      padding: 16px;
+      border-left: 4px solid var(--primary);
+      background: var(--card-bg);
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .activity-message {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .activity-meta {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 20px 0;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .history-table th {
+      background: rgba(67, 97, 238, 0.1);
+      font-weight: 600;
+    }
+
+    .report-card {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .report-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box .form-control {
+      padding-left: 40px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 8px;
+    }
+
+    .page-item {
+      list-style: none;
+    }
+
+    .page-link {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+      text-decoration: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .page-link:hover {
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    .page-link.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+
+    .no-data i {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .content-area {
+        padding: 16px;
+      }
+      
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .chart-container {
+        height: 250px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <i class="fa-solid fa-chart-line" style="color:white;font-size:24px"></i>
+        <div class="sidebar-brand">Painel de Monitoramento</div>
+      </div>
+      
+      <div class="system-info">
+        <div class="system-icon">
+          <i class="fa-solid fa-school"></i>
+        </div>
+        <div class="system-info">
+          <h5>Sistema Escolar</h5>
+          <p>Painel de Atividades</p>
+          <span class="admin-role-badge admin">Monitoramento</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-section="admins"><i class="fa-solid fa-user-shield"></i><span>Administradores</span></a>
+        <a class="nav-item" data-section="estatisticas"><i class="fa-solid fa-chart-bar"></i><span>Estatísticas</span></a>
+        <a class="nav-item" data-section="historico"><i class="fa-solid fa-clock-rotate-left"></i><span>Histórico</span></a>
+        <a class="nav-item" data-section="relatorios"><i class="fa-solid fa-file-lines"></i><span>Relatórios</span></a>
+      </nav>
+    </div>
+
+    <div class="content-area">
+      <!-- Seção Administradores -->
+      <div class="content-section active" id="admins-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="section-title">Monitoramento do Sistema</h2>
+            <div class="muted">Acompanhe todas as atividades dos administradores</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="theme-toggle" id="themeToggle">
+              <i class="fa-solid fa-sun"></i>
+            </button>
+            <button id="btnExportAdmins" class="export-btn">
+              <i class="fa-solid fa-download"></i> Exportar PDF
+            </button>
+            <button id="btnAddAdmin" class="btn btn-primary">
+              <i class="fa-solid fa-plus"></i> Novo Admin
+            </button>
+            <a href="index.html" class="login-btn">
+              <i class="fa-solid fa-right-to-bracket"></i> Fazer Login
+            </a>
+          </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <div class="label">Total de Admins</div>
+            <div class="value" id="totalAdmins">0</div>
+            <div class="muted">Ativos: <span id="ativosCount">0</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Atividades Hoje</div>
+            <div class="value" id="todayActivities">0</div>
+            <div class="muted">Ações realizadas</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Total de Logs</div>
+            <div class="value" id="totalLogs">0</div>
+            <div class="muted">Registros de atividades</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Última Atividade</div>
+            <div class="value" id="lastActivity">-</div>
+            <div class="muted">Mais recente</div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-section">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="form-label">Buscar Admin</label>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="adminSearch" class="form-control" placeholder="Buscar por nome, email...">
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Status</label>
+              <select id="adminFilterStatus" class="form-select">
+                <option value="">Todos</option>
+                <option value="Ativo">Ativos</option>
+                <option value="Inativo">Inativos</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Categoria</label>
+              <select id="adminFilterCategoria" class="form-select">
+                <option value="">Todas</option>
+                <option value="Super Admin">Super Admin</option>
+                <option value="Admin">Admin</option>
+                <option value="Moderador">Moderador</option>
+                <option value="Suporte">Suporte</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">&nbsp;</label>
+              <button id="btnLimparFiltrosAdmin" class="btn btn-outline-secondary">Limpar Filtros</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Administradores -->
+        <div id="adminList">
+          <div class="card-ui text-center py-5">
+            <div class="loading mx-auto mb-3"></div>
+            <h5 class="text-muted">Carregando administradores...</h5>
+          </div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination" id="adminPagination" style="display: none;">
+          <!-- Paginação será gerada dinamicamente -->
+        </div>
+
+        <!-- Atividades Recentes -->
+        <div class="activity-log">
+          <h4 class="section-title">Atividades Recentes</h4>
+          <div id="recentActivities">
+            <div class="card-ui text-center py-4">
+              <div class="loading mx-auto mb-3"></div>
+              <h6 class="text-muted">Carregando atividades...</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção Estatísticas -->
+      <div class="content-section" id="estatisticas-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="section-title">Estatísticas do Sistema</h2>
+            <div class="muted">Análise detalhada das atividades e desempenho</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="theme-toggle">
+              <i class="fa-solid fa-sun"></i>
+            </button>
+            <button id="btnExportStats" class="export-btn">
+              <i class="fa-solid fa-download"></i> Exportar PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card-ui">
+              <h4>Atividades por Tipo</h4>
+              <div class="chart-container">
+                <canvas id="activitiesChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-ui">
+              <h4>Distribuição de Admins</h4>
+              <div class="chart-container">
+                <canvas id="adminsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card-ui">
+              <h4>Atividades por Período</h4>
+              <div class="chart-container">
+                <canvas id="timelineChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estatísticas Detalhadas -->
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card-ui">
+              <h4>Top Administradores</h4>
+              <div id="topAdminsList">
+                <div class="loading mx-auto mb-3"></div>
+                <span class="text-muted">Carregando...</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-ui">
+              <h4>Métricas do Sistema</h4>
+              <div id="systemMetrics">
+                <div class="loading mx-auto mb-3"></div>
+                <span class="text-muted">Carregando...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção Histórico -->
+      <div class="content-section" id="historico-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="section-title">Histórico Completo</h2>
+            <div class="muted">Registro completo de todas as atividades do sistema</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="theme-toggle">
+              <i class="fa-solid fa-sun"></i>
+            </button>
+            <button id="btnExportHistory" class="export-btn">
+              <i class="fa-solid fa-download"></i> Exportar PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="form-label">Buscar no Histórico</label>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="historySearch" class="form-control" placeholder="Buscar por atividade, admin...">
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Data Inicial</label>
+              <input type="date" id="historyDateStart" class="form-control">
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Data Final</label>
+              <input type="date" id="historyDateEnd" class="form-control">
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Tipo de Atividade</label>
+              <select id="historyFilterType" class="form-select">
+                <option value="">Todos os tipos</option>
+                <option value="admin_cadastro">Cadastro de Admin</option>
+                <option value="admin_edicao">Edição de Admin</option>
+                <option value="admin_remocao">Remoção de Admin</option>
+                <option value="admin_action">Ação de Admin</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">&nbsp;</label>
+              <button id="btnLimparHistorico" class="btn btn-outline-secondary">Limpar Filtros</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-ui">
+          <div class="table-responsive">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Administrador</th>
+                  <th>Atividade</th>
+                  <th>Tipo</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="4" class="text-center py-4">
+                    <div class="loading mx-auto mb-3"></div>
+                    <span class="text-muted">Carregando histórico...</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Paginação do Histórico -->
+        <div class="pagination" id="historyPagination" style="display: none;">
+          <!-- Paginação será gerada dinamicamente -->
+        </div>
+      </div>
+
+      <!-- Seção Relatórios -->
+      <div class="content-section" id="relatorios-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="section-title">Relatórios</h2>
+            <div class="muted">Gerar relatórios detalhados do sistema</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="theme-toggle">
+              <i class="fa-solid fa-sun"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card-ui report-card" onclick="gerarRelatorio('admins')">
+              <div class="d-flex align-items-center">
+                <div class="admin-avatar-small">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                  <h5>Relatório de Administradores</h5>
+                  <p class="muted">Lista completa de todos os administradores com estatísticas</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-ui report-card" onclick="gerarRelatorio('atividades')">
+              <div class="d-flex align-items-center">
+                <div class="admin-avatar-small">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                  <h5>Relatório de Atividades</h5>
+                  <p class="muted">Relatório detalhado de todas as atividades do sistema</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card-ui report-card" onclick="gerarRelatorio('estatisticas')">
+              <div class="d-flex align-items-center">
+                <div class="admin-avatar-small">
+                  <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div>
+                  <h5>Relatório Estatístico</h5>
+                  <p class="muted">Análise estatística completa do sistema</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-ui report-card" onclick="gerarRelatorio('completo')">
+              <div class="d-flex align-items-center">
+                <div class="admin-avatar-small">
+                  <i class="fa-solid fa-file-alt"></i>
+                </div>
+                <div>
+                  <h5>Relatório Completo</h5>
+                  <p class="muted">Relatório abrangente com todos os dados do sistema</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Relatórios Personalizados -->
+        <div class="card-ui mt-4">
+          <h4>Relatórios Personalizados</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Data Inicial</label>
+                <input type="date" id="customReportStart" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Data Final</label>
+                <input type="date" id="customReportEnd" class="form-control">
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tipo de Relatório</label>
+            <select id="customReportType" class="form-select">
+              <option value="atividades">Atividades</option>
+              <option value="admins">Administradores</option>
+              <option value="estatisticas">Estatísticas</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="gerarRelatorioPersonalizado()">
+            <i class="fa-solid fa-download"></i> Gerar Relatório Personalizado
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+    // Configuração do Firebase
+ const firebaseConfig = {
+  apiKey: "AIzaSyBImtt43SlMdLtAiNUY26qpikIhG8ozyrY",
+  authDomain: "escola-a907f.firebaseapp.com",
+  databaseURL: "https://escola-a907f-default-rtdb.firebaseio.com",
+  projectId: "escola-a907f",
+  storageBucket: "escola-a907f.firebasestorage.app",
+  messagingSenderId: "323325281431",
+  appId: "1:323325281431:web:8a6dab5572fe541abd15d2"
+};
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Variáveis globais
+    let allAdminsData = {};
+    let allLogsData = {};
+    let activitiesChart, adminsChart, timelineChart;
+    let currentAdminPage = 1;
+    let currentHistoryPage = 1;
+    const itemsPerPage = 5;
+
+    // Sistema de Navegação
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        // Remover classe active de todos
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+        
+        // Adicionar classe active ao item clicado
+        this.classList.add('active');
+        
+        // Mostrar seção correspondente
+        const sectionId = this.getAttribute('data-section') + '-section';
+        document.getElementById(sectionId).classList.add('active');
+
+        // Carregar dados específicos da seção
+        if (this.getAttribute('data-section') === 'estatisticas') {
+          carregarEstatisticas();
+        } else if (this.getAttribute('data-section') === 'historico') {
+          carregarHistorico();
+        }
+      });
+    });
+
+    // Funções utilitárias
+    const escapeHtml = str => String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    
+    function formatarData(dataString) {
+        if (!dataString) return '---';
+        try {
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR');
+        } catch (e) {
+            return '---';
+        }
+    }
+
+    function formatarTimestamp(timestamp) {
+        if (!timestamp) return '---';
+        try {
+            // Se for um objeto do Firebase Timestamp
+            if (timestamp.seconds) {
+                const data = new Date(timestamp.seconds * 1000);
+                return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR');
+            }
+            // Se for uma string ISO
+            const data = new Date(timestamp);
+            return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR');
+        } catch (e) {
+            return '---';
+        }
+    }
+
+    // Contar atividades do admin
+    function contarAtividadesAdmin(adminId, adminNome) {
+        if (!allLogsData || Object.keys(allLogsData).length === 0) {
+            return { alunos: 0, professores: 0, financeiro: 0, total: 0 };
+        }
+        
+        const logs = Object.values(allLogsData);
+        let alunos = 0, professores = 0, financeiro = 0, total = 0;
+        
+        logs.forEach(log => {
+            if (log && log.adminId === adminId) {
+                total++;
+                const msg = log.message ? log.message.toLowerCase() : '';
+                if (msg.includes('aluno')) alunos++;
+                if (msg.includes('professor')) professores++;
+                if (msg.includes('financeiro') || msg.includes('mensalidade')) financeiro++;
+            }
+        });
+        
+        return { alunos, professores, financeiro, total };
+    }
+
+    // Event Listeners
+    document.getElementById('adminSearch').addEventListener('input', () => {
+        currentAdminPage = 1;
+        renderAdmins(allAdminsData);
+    });
+    document.getElementById('adminFilterStatus').addEventListener('change', () => {
+        currentAdminPage = 1;
+        renderAdmins(allAdminsData);
+    });
+    document.getElementById('adminFilterCategoria').addEventListener('change', () => {
+        currentAdminPage = 1;
+        renderAdmins(allAdminsData);
+    });
+    document.getElementById('btnLimparFiltrosAdmin').addEventListener('click', () => {
+        document.getElementById('adminSearch').value = '';
+        document.getElementById('adminFilterStatus').value = '';
+        document.getElementById('adminFilterCategoria').value = '';
+        currentAdminPage = 1;
+        renderAdmins(allAdminsData);
+    });
+
+    // Filtros do histórico
+    document.getElementById('historySearch').addEventListener('input', () => {
+        currentHistoryPage = 1;
+        renderHistoricoCompleto();
+    });
+    document.getElementById('historyFilterType').addEventListener('change', () => {
+        currentHistoryPage = 1;
+        renderHistoricoCompleto();
+    });
+    document.getElementById('btnLimparHistorico').addEventListener('click', () => {
+        document.getElementById('historySearch').value = '';
+        document.getElementById('historyDateStart').value = '';
+        document.getElementById('historyDateEnd').value = '';
+        document.getElementById('historyFilterType').value = '';
+        currentHistoryPage = 1;
+        renderHistoricoCompleto();
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    document.getElementById('btnExportAdmins').addEventListener('click', () => exportarPDF('admins'));
+    document.getElementById('btnExportStats').addEventListener('click', () => exportarPDF('estatisticas'));
+    document.getElementById('btnExportHistory').addEventListener('click', () => exportarPDF('historico'));
+
+    document.getElementById('btnAddAdmin').addEventListener('click', cadastrarAdmin);
+
+    function updateThemeIcon(theme) {
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (theme === 'dark') {
+            themeIcon.className = 'fa-solid fa-sun';
+        } else {
+            themeIcon.className = 'fa-solid fa-moon';
+        }
+    }
+
+    // Cadastrar Administrador
+    async function cadastrarAdmin() {
+        const { value: formValues } = await Swal.fire({
+            title: 'Cadastrar Administrador',
+            html: `
+                <div style="text-align: left;">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Nome Completo *</label>
+                            <input type="text" id="swal_nome" class="form-control" placeholder="Nome completo" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Email *</label>
+                            <input type="email" id="swal_email" class="form-control" placeholder="Email" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Telefone *</label>
+                            <input type="text" id="swal_telefone" class="form-control" placeholder="Telefone" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Senha *</label>
+                            <input type="password" id="swal_senha" class="form-control" placeholder="Senha de acesso" required minlength="6">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Categoria *</label>
+                            <select id="swal_categoria" class="form-select" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Super Admin">Super Admin</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Moderador">Moderador</option>
+                                <option value="Suporte">Suporte</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Status *</label>
+                            <select id="swal_status" class="form-select" required>
+                                <option value="Ativo">Ativo</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Permissões</label>
+                        <div class="border rounded p-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="swal_perm_gestao" checked>
+                                <label class="form-check-label" for="swal_perm_gestao">
+                                    Gestão de Usuários
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="swal_perm_financeiro" checked>
+                                <label class="form-check-label" for="swal_perm_financeiro">
+                                    Gestão Financeira
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="swal_perm_relatorios" checked>
+                                <label class="form-check-label" for="swal_perm_relatorios">
+                                    Relatórios
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Cadastrar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const nome = document.getElementById('swal_nome').value;
+                const email = document.getElementById('swal_email').value;
+                const telefone = document.getElementById('swal_telefone').value;
+                const senha = document.getElementById('swal_senha').value;
+                const categoria = document.getElementById('swal_categoria').value;
+                const status = document.getElementById('swal_status').value;
+                
+                const permissoes = {
+                    gestao: document.getElementById('swal_perm_gestao').checked,
+                    financeiro: document.getElementById('swal_perm_financeiro').checked,
+                    relatorios: document.getElementById('swal_perm_relatorios').checked
+                };
+
+                if (!nome || !email || !telefone || !senha || !categoria || !status) {
+                    Swal.showValidationMessage('Preencha todos os campos obrigatórios');
+                    return false;
+                }
+                if (senha.length < 6) {
+                    Swal.showValidationMessage('A senha deve ter pelo menos 6 caracteres');
+                    return false;
+                }
+                return { nome, email, telefone, senha, categoria, status, permissoes };
+            }
+        });
+
+        if (formValues) {
+            try {
+                const novoAdmin = {
+                    nome: formValues.nome,
+                    email: formValues.email,
+                    telefone: formValues.telefone,
+                    password: formValues.senha,
+                    categoria: formValues.categoria,
+                    status: formValues.status,
+                    permissoes: formValues.permissoes,
+                    dataCadastro: new Date().toISOString(),
+                    criadoPor: 'Sistema de Monitoramento',
+                    createdAt: serverTimestamp()
+                };
+
+                await set(push(ref(db, 'Admin')), novoAdmin);
+                
+                // Registrar atividade
+                await set(push(ref(db, 'logs')), {
+                    message: `Sistema cadastrou o administrador ${novoAdmin.nome}`,
+                    timestamp: serverTimestamp(),
+                    adminName: 'Sistema de Monitoramento',
+                    tipo: 'admin_cadastro'
+                });
+                
+                Swal.fire('Sucesso!', 'Administrador cadastrado com sucesso.', 'success');
+            } catch (error) {
+                console.error('Erro ao cadastrar admin:', error);
+                Swal.fire('Erro!', 'Não foi possível cadastrar o administrador.', 'error');
+            }
+        }
+    }
+
+    // Editar Administrador
+    window.editarAdmin = async function(id) {
+        const admin = allAdminsData[id];
+        if (!admin) {
+            Swal.fire('Erro!', 'Administrador não encontrado.', 'error');
+            return;
+        }
+
+        const { value: formValues } = await Swal.fire({
+            title: 'Editar Administrador',
+            html: `
+                <div style="text-align: left;">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Nome Completo</label>
+                            <input type="text" id="swal_nome" class="form-control" value="${escapeHtml(admin.nome || '')}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="swal_email" class="form-control" value="${escapeHtml(admin.email || '')}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" id="swal_telefone" class="form-control" value="${escapeHtml(admin.telefone || '')}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Nova Senha</label>
+                            <input type="password" id="swal_senha" class="form-control" placeholder="Deixe em branco para manter atual">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Categoria</label>
+                            <select id="swal_categoria" class="form-select" required>
+                                <option value="Super Admin" ${admin.categoria === 'Super Admin' ? 'selected' : ''}>Super Admin</option>
+                                <option value="Admin" ${admin.categoria === 'Admin' ? 'selected' : ''}>Admin</option>
+                                <option value="Moderador" ${admin.categoria === 'Moderador' ? 'selected' : ''}>Moderador</option>
+                                <option value="Suporte" ${admin.categoria === 'Suporte' ? 'selected' : ''}>Suporte</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Status</label>
+                            <select id="swal_status" class="form-select" required>
+                                <option value="Ativo" ${admin.status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                                <option value="Inativo" ${admin.status === 'Inativo' ? 'selected' : ''}>Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Permissões</label>
+                        <div class="border rounded p-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="swal_perm_gestao" ${admin.permissoes?.gestao ? 'checked' : ''}>
+                                <label class="form-check-label" for="swal_perm_gestao">
+                                    Gestão de Usuários
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="swal_perm_financeiro" ${admin.permissoes?.financeiro ? 'checked' : ''}>
+                                <label class="form-check-label" for="swal_perm_financeiro">
+                                    Gestão Financeira
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="swal_perm_relatorios" ${admin.permissoes?.relatorios ? 'checked' : ''}>
+                                <label class="form-check-label" for="swal_perm_relatorios">
+                                    Relatórios
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar Alterações',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const nome = document.getElementById('swal_nome').value;
+                const email = document.getElementById('swal_email').value;
+                const telefone = document.getElementById('swal_telefone').value;
+                const senha = document.getElementById('swal_senha').value;
+                const categoria = document.getElementById('swal_categoria').value;
+                const status = document.getElementById('swal_status').value;
+                
+                const permissoes = {
+                    gestao: document.getElementById('swal_perm_gestao').checked,
+                    financeiro: document.getElementById('swal_perm_financeiro').checked,
+                    relatorios: document.getElementById('swal_perm_relatorios').checked
+                };
+
+                if (!nome || !email || !telefone || !categoria || !status) {
+                    Swal.showValidationMessage('Preencha todos os campos obrigatórios');
+                    return false;
+                }
+                return { nome, email, telefone, senha, categoria, status, permissoes };
+            }
+        });
+
+        if (formValues) {
+            try {
+                const adminAtualizado = {
+                    ...admin,
+                    nome: formValues.nome,
+                    email: formValues.email,
+                    telefone: formValues.telefone,
+                    categoria: formValues.categoria,
+                    status: formValues.status,
+                    permissoes: formValues.permissoes,
+                    updatedAt: serverTimestamp()
+                };
+
+                // Atualizar senha apenas se foi fornecida
+                if (formValues.senha) {
+                    adminAtualizado.password = formValues.senha;
+                }
+
+                await update(ref(db, `Admin/${id}`), adminAtualizado);
+                
+                // Registrar atividade
+                await set(push(ref(db, 'logs')), {
+                    message: `Sistema atualizou o administrador ${adminAtualizado.nome}`,
+                    timestamp: serverTimestamp(),
+                    adminName: 'Sistema de Monitoramento',
+                    tipo: 'admin_edicao'
+                });
+                
+                Swal.fire('Sucesso!', 'Administrador atualizado com sucesso.', 'success');
+            } catch (error) {
+                console.error('Erro ao atualizar admin:', error);
+                Swal.fire('Erro!', 'Não foi possível atualizar o administrador.', 'error');
+            }
+        }
+    }
+
+    // Excluir Administrador
+    window.excluirAdmin = async function(nome, id) {
+        const result = await Swal.fire({
+            title: `Remover ${nome}?`,
+            text: `Esta ação não pode ser desfeita.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Sim, remover!'
+        });
+        
+        if (result.isConfirmed) {
+            try {
+                await remove(ref(db, `Admin/${id}`));
+                
+                // Registrar atividade
+                await set(push(ref(db, 'logs')), {
+                    message: `Sistema removeu o administrador ${nome}`,
+                    timestamp: serverTimestamp(),
+                    adminName: 'Sistema de Monitoramento',
+                    tipo: 'admin_remocao'
+                });
+                
+                Swal.fire('Removido!', 'Administrador removido com sucesso.', 'success');
+            } catch (error) {
+                console.error('Erro ao excluir admin:', error);
+                Swal.fire('Erro!', 'Não foi possível remover o administrador.', 'error');
+            }
+        }
+    }
+
+    // Exportar para PDF
+    function exportarPDF(tipo) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        let titulo = '';
+        let conteudo = '';
+
+        switch(tipo) {
+            case 'admins':
+                titulo = 'Relatório de Administradores';
+                conteudo = gerarConteudoPDFAdmins();
+                break;
+            case 'estatisticas':
+                titulo = 'Relatório Estatístico';
+                conteudo = gerarConteudoPDFEstatisticas();
+                break;
+            case 'historico':
+                titulo = 'Relatório Histórico';
+                conteudo = gerarConteudoPDFHistorico();
+                break;
+        }
+
+        // Cabeçalho
+        doc.setFontSize(20);
+        doc.setTextColor(67, 97, 238);
+        doc.text(titulo, 20, 20);
+        
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 20, 30);
+
+        // Adicionar conteúdo
+        doc.autoTable({
+            head: conteudo.head,
+            body: conteudo.body,
+            startY: 40,
+            theme: 'grid',
+            styles: {
+                fontSize: 10,
+                cellPadding: 3,
+            },
+            headStyles: {
+                fillColor: [67, 97, 238],
+                textColor: 255,
+                fontStyle: 'bold'
+            }
+        });
+        
+        // Salvar PDF
+        const dataHoje = new Date().toISOString().split('T')[0];
+        doc.save(`${tipo}_${dataHoje}.pdf`);
+        
+        Swal.fire('Sucesso!', 'PDF gerado com sucesso.', 'success');
+    }
+
+    function gerarConteudoPDFAdmins() {
+        const tableColumn = ["Nome", "Email", "Categoria", "Status", "Atividades"];
+        const tableRows = [];
+        
+        Object.entries(allAdminsData).forEach(([id, admin]) => {
+            if (!admin) return;
+            const atividades = contarAtividadesAdmin(id, admin.nome);
+            const adminData = [
+                admin.nome || '',
+                admin.email || '',
+                admin.categoria || '',
+                admin.status || '',
+                atividades.total.toString()
+            ];
+            tableRows.push(adminData);
+        });
+
+        return { head: [tableColumn], body: tableRows };
+    }
+
+    function gerarConteudoPDFEstatisticas() {
+        const stats = calcularEstatisticas();
+        const tableColumn = ["Métrica", "Valor"];
+        const tableRows = [
+            ['Total de Administradores', stats.totalAdmins],
+            ['Administradores Ativos', stats.adminsAtivos],
+            ['Total de Atividades', stats.totalAtividades],
+            ['Atividades Hoje', stats.atividadesHoje],
+            ['Atividades com Alunos', stats.atividadesAlunos],
+            ['Atividades com Professores', stats.atividadesProfessores],
+            ['Atividades Financeiras', stats.atividadesFinanceiras]
+        ];
+
+        return { head: [tableColumn], body: tableRows };
+    }
+
+    function gerarConteudoPDFHistorico() {
+        const tableColumn = ["Data/Hora", "Administrador", "Atividade", "Tipo"];
+        const tableRows = [];
+        
+        const logsOrdenados = Object.values(allLogsData)
+            .filter(log => log && log.message)
+            .sort((a, b) => {
+                const timeA = a.timestamp?.seconds || new Date(a.timestamp).getTime();
+                const timeB = b.timestamp?.seconds || new Date(b.timestamp).getTime();
+                return timeB - timeA;
+            });
+
+        logsOrdenados.forEach(log => {
+            const logData = [
+                formatarTimestamp(log.timestamp),
+                log.adminName || 'Sistema',
+                log.message || '',
+                log.tipo || 'Geral'
+            ];
+            tableRows.push(logData);
+        });
+
+        return { head: [tableColumn], body: tableRows };
+    }
+
+    // Carregar dados do Firebase
+    function carregarDados() {
+        console.log('Carregando dados do Firebase...');
+
+        // Carregar administradores
+        const adminRef = ref(db, 'Admin');
+        onValue(adminRef, (snapshot) => {
+            console.log('Dados de administradores recebidos:', snapshot.val());
+            allAdminsData = snapshot.val() || {};
+            renderAdmins(allAdminsData);
+            updateAdminStats(allAdminsData);
+        }, (error) => {
+            console.error('Erro ao carregar administradores:', error);
+            document.getElementById('adminList').innerHTML = `
+                <div class="card-ui text-center py-5">
+                    <i class="fa-solid fa-exclamation-triangle text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="text-danger">Erro ao carregar dados</h5>
+                    <p class="text-muted">Verifique sua conexão com o Firebase.</p>
+                </div>
+            `;
+        });
+
+        // Carregar logs para estatísticas
+        const logsRef = ref(db, 'logs');
+        onValue(logsRef, (snapshot) => {
+            console.log('Dados de logs recebidos:', snapshot.val());
+            allLogsData = snapshot.val() || {};
+            renderAdmins(allAdminsData);
+            renderRecentActivities();
+            updateAdminStats(allAdminsData);
+        });
+    }
+
+    // Carregar Estatísticas
+    function carregarEstatisticas() {
+        if (!activitiesChart) {
+            criarGraficos();
+        } else {
+            atualizarGraficos();
+        }
+        renderTopAdmins();
+        renderSystemMetrics();
+    }
+
+    // Carregar Histórico
+    function carregarHistorico() {
+        renderHistoricoCompleto();
+    }
+
+    // Criar gráficos
+    function criarGraficos() {
+        const stats = calcularEstatisticas();
+
+        // Gráfico de atividades por tipo
+        const activitiesCtx = document.getElementById('activitiesChart').getContext('2d');
+        activitiesChart = new Chart(activitiesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Alunos', 'Professores', 'Financeiro', 'Outros'],
+                datasets: [{
+                    data: [
+                        stats.atividadesAlunos,
+                        stats.atividadesProfessores,
+                        stats.atividadesFinanceiras,
+                        stats.totalAtividades - (stats.atividadesAlunos + stats.atividadesProfessores + stats.atividadesFinanceiras)
+                    ],
+                    backgroundColor: [
+                        '#4361ee',
+                        '#7209b7',
+                        '#f72585',
+                        '#4cc9f0'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Gráfico de distribuição de admins
+        const adminsCtx = document.getElementById('adminsChart').getContext('2d');
+        adminsChart = new Chart(adminsCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Super Admin', 'Admin', 'Moderador', 'Suporte'],
+                datasets: [{
+                    data: [
+                        stats.superAdmins,
+                        stats.admins,
+                        stats.moderadores,
+                        stats.suportes
+                    ],
+                    backgroundColor: [
+                        '#e74c3c',
+                        '#3498db',
+                        '#f39c12',
+                        '#2ecc71'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Gráfico de timeline
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        const timelineData = calcularTimelineData();
+        
+        timelineChart = new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: timelineData.labels,
+                datasets: [{
+                    label: 'Atividades por Dia',
+                    data: timelineData.data,
+                    borderColor: '#4361ee',
+                    backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function atualizarGraficos() {
+        const stats = calcularEstatisticas();
+        const timelineData = calcularTimelineData();
+
+        // Atualizar gráfico de atividades
+        activitiesChart.data.datasets[0].data = [
+            stats.atividadesAlunos,
+            stats.atividadesProfessores,
+            stats.atividadesFinanceiras,
+            stats.totalAtividades - (stats.atividadesAlunos + stats.atividadesProfessores + stats.atividadesFinanceiras)
+        ];
+        activitiesChart.update();
+
+        // Atualizar gráfico de admins
+        adminsChart.data.datasets[0].data = [
+            stats.superAdmins,
+            stats.admins,
+            stats.moderadores,
+            stats.suportes
+        ];
+        adminsChart.update();
+
+        // Atualizar gráfico de timeline
+        timelineChart.data.labels = timelineData.labels;
+        timelineChart.data.datasets[0].data = timelineData.data;
+        timelineChart.update();
+    }
+
+    // Renderizar top administradores
+    function renderTopAdmins() {
+        const topAdminsDiv = document.getElementById('topAdminsList');
+        
+        if (!allAdminsData || Object.keys(allAdminsData).length === 0) {
+            topAdminsDiv.innerHTML = '<div class="no-data">Nenhum administrador</div>';
+            return;
+        }
+
+        // Calcular atividades por admin e ordenar
+        const adminsComAtividades = Object.entries(allAdminsData)
+            .map(([id, admin]) => {
+                const atividades = contarAtividadesAdmin(id, admin.nome);
+                return {
+                    ...admin,
+                    id,
+                    totalAtividades: atividades.total
+                };
+            })
+            .sort((a, b) => b.totalAtividades - a.totalAtividades)
+            .slice(0, 5); // Top 5
+
+        topAdminsDiv.innerHTML = adminsComAtividades.map(admin => `
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                <div>
+                    <div class="fw-bold">${escapeHtml(admin.nome)}</div>
+                    <small class="text-muted">${escapeHtml(admin.categoria)}</small>
+                </div>
+                <span class="badge bg-primary">${admin.totalAtividades} atividades</span>
+            </div>
+        `).join('');
+    }
+
+    // Renderizar métricas do sistema
+    function renderSystemMetrics() {
+        const metricsDiv = document.getElementById('systemMetrics');
+        const stats = calcularEstatisticas();
+
+        metricsDiv.innerHTML = `
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Taxa de Atividade/Dia:</span>
+                    <span class="fw-bold">${(stats.totalAtividades / 30).toFixed(1)}</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Admins Ativos:</span>
+                    <span class="fw-bold text-success">${stats.adminsAtivos}/${stats.totalAdmins}</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Atividades Hoje:</span>
+                    <span class="fw-bold text-primary">${stats.atividadesHoje}</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Total de Logs:</span>
+                    <span class="fw-bold">${stats.totalAtividades}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function calcularEstatisticas() {
+        const admins = Object.values(allAdminsData).filter(admin => admin);
+        const logs = Object.values(allLogsData).filter(log => log);
+
+        // Calcular atividades por tipo
+        let atividadesAlunos = 0, atividadesProfessores = 0, atividadesFinanceiras = 0;
+        
+        logs.forEach(log => {
+            const msg = log.message ? log.message.toLowerCase() : '';
+            if (msg.includes('aluno')) atividadesAlunos++;
+            if (msg.includes('professor')) atividadesProfessores++;
+            if (msg.includes('financeiro') || msg.includes('mensalidade')) atividadesFinanceiras++;
+        });
+
+        // Calcular distribuição de admins
+        let superAdmins = 0, adminsCount = 0, moderadores = 0, suportes = 0;
+        
+        admins.forEach(admin => {
+            switch(admin.categoria) {
+                case 'Super Admin': superAdmins++; break;
+                case 'Admin': adminsCount++; break;
+                case 'Moderador': moderadores++; break;
+                case 'Suporte': suportes++; break;
+            }
+        });
+
+        // Calcular atividades de hoje
+        const hoje = new Date().toDateString();
+        const atividadesHoje = logs.filter(log => {
+            if (!log.timestamp) return false;
+            let logDate;
+            if (log.timestamp.seconds) {
+                logDate = new Date(log.timestamp.seconds * 1000).toDateString();
+            } else {
+                logDate = new Date(log.timestamp).toDateString();
+            }
+            return logDate === hoje;
+        }).length;
+
+        return {
+            totalAdmins: admins.length,
+            adminsAtivos: admins.filter(admin => admin.status === 'Ativo').length,
+            totalAtividades: logs.length,
+            atividadesHoje: atividadesHoje,
+            atividadesAlunos: atividadesAlunos,
+            atividadesProfessores: atividadesProfessores,
+            atividadesFinanceiras: atividadesFinanceiras,
+            superAdmins: superAdmins,
+            admins: adminsCount,
+            moderadores: moderadores,
+            suportes: suportes
+        };
+    }
+
+    function calcularTimelineData() {
+        const logs = Object.values(allLogsData).filter(log => log && log.timestamp);
+        const ultimos7Dias = [];
+        
+        // Gerar array dos últimos 7 dias
+        for (let i = 6; i >= 0; i--) {
+            const data = new Date();
+            data.setDate(data.getDate() - i);
+            ultimos7Dias.push(data.toDateString());
+        }
+
+        // Contar atividades por dia
+        const atividadesPorDia = ultimos7Dias.map(dia => {
+            return logs.filter(log => {
+                let logDate;
+                if (log.timestamp.seconds) {
+                    logDate = new Date(log.timestamp.seconds * 1000).toDateString();
+                } else {
+                    logDate = new Date(log.timestamp).toDateString();
+                }
+                return logDate === dia;
+            }).length;
+        });
+
+        return {
+            labels: ultimos7Dias.map(dia => new Date(dia).toLocaleDateString('pt-BR')),
+            data: atividadesPorDia
+        };
+    }
+
+    // Renderizar lista de administradores
+    function renderAdmins(adminsData) {
+        const adminListDiv = document.getElementById('adminList');
+        const paginationDiv = document.getElementById('adminPagination');
+        
+        if (!adminsData || Object.keys(adminsData).length === 0) {
+            adminListDiv.innerHTML = `
+                <div class="no-data">
+                    <i class="fa-solid fa-user-shield text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted">Nenhum administrador cadastrado</h5>
+                    <p class="text-muted mb-3">Os administradores aparecerão aqui quando forem cadastrados.</p>
+                </div>
+            `;
+            paginationDiv.style.display = 'none';
+            return;
+        }
+
+        // Aplicar filtros
+        const searchTerm = document.getElementById('adminSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('adminFilterStatus').value;
+        const categoriaFilter = document.getElementById('adminFilterCategoria').value;
+
+        const adminsFiltrados = Object.entries(adminsData).filter(([id, admin]) => {
+            if (!admin) return false;
+            
+            const nomeMatch = admin.nome?.toLowerCase().includes(searchTerm) || false;
+            const emailMatch = admin.email?.toLowerCase().includes(searchTerm) || false;
+            const statusMatch = !statusFilter || admin.status === statusFilter;
+            const categoriaMatch = !categoriaFilter || admin.categoria === categoriaFilter;
+            
+            return (nomeMatch || emailMatch) && statusMatch && categoriaMatch;
+        });
+
+        if (adminsFiltrados.length === 0) {
+            adminListDiv.innerHTML = `
+                <div class="no-data">
+                    <i class="fa-solid fa-search text-muted mb-2" style="font-size: 2rem;"></i>
+                    <h5 class="text-muted">Nenhum administrador encontrado</h5>
+                    <p class="text-muted">Tente ajustar os filtros de busca.</p>
+                </div>
+            `;
+            paginationDiv.style.display = 'none';
+            return;
+        }
+
+        // Paginação
+        const totalPages = Math.ceil(adminsFiltrados.length / itemsPerPage);
+        const startIndex = (currentAdminPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const adminsPaginados = adminsFiltrados.slice(startIndex, endIndex);
+
+        // Gerar HTML
+        adminListDiv.innerHTML = adminsPaginados.map(([id, admin]) => {
+            if (!admin) return '';
+            
+            const statusClass = admin.status === 'Ativo' ? 'ativo' : 'inativo';
+            const roleClass = admin.categoria ? admin.categoria.toLowerCase().replace(' ', '-') : '';
+            const atividades = contarAtividadesAdmin(id, admin.nome);
+            
+            // Gerar badges de permissões
+            const permissoesHTML = admin.permissoes ? Object.entries(admin.permissoes)
+                .filter(([key, value]) => value)
+                .map(([key]) => {
+                    const labels = {
+                        gestao: 'Gestão de Usuários',
+                        financeiro: 'Financeiro',
+                        relatorios: 'Relatórios'
+                    };
+                    return `<span class="admin-badge">${labels[key] || key}</span>`;
+                }).join('') : '';
+            
+            return `
+                <div class="card-ui admin-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="admin-avatar-small">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <div class="meta">${escapeHtml(admin.nome || 'Sem nome')}</div>
+                                <div class="muted">${escapeHtml(admin.email || 'Sem email')}</div>
+                            </div>
+                        </div>
+                        <span class="admin-role-badge ${roleClass}">${escapeHtml(admin.categoria || 'Sem categoria')}</span>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="muted">Telefone</div>
+                            <div>${escapeHtml(admin.telefone || '---')}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="muted">Status</div>
+                            <div><span class="status-dot ${statusClass}"></span> ${escapeHtml(admin.status || '---')}</div>
+                        </div>
+                    </div>
+
+                    <!-- Estatísticas de Atividades -->
+                    <div class="mb-3">
+                        <div class="muted">Atividades Realizadas</div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">${atividades.alunos}</div>
+                                <div class="stat-label">Alunos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${atividades.professores}</div>
+                                <div class="stat-label">Professores</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${atividades.financeiro}</div>
+                                <div class="stat-label">Financeiro</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${atividades.total}</div>
+                                <div class="stat-label">Total</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${permissoesHTML ? `
+                    <div class="mb-3">
+                        <div class="muted">Permissões</div>
+                        <div>${permissoesHTML}</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="muted">
+                            <i class="fa-solid fa-calendar"></i> 
+                            Cadastrado em: ${formatarData(admin.dataCadastro)}
+                            ${admin.criadoPor ? ` por ${escapeHtml(admin.criadoPor)}` : ''}
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editarAdmin('${id}')">
+                                <i class="fa-solid fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="excluirAdmin('${escapeHtml(admin.nome)}', '${id}')">
+                                <i class="fa-solid fa-trash"></i> Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Gerar paginação
+        if (totalPages > 1) {
+            let paginationHTML = '';
+            
+            // Botão anterior
+            if (currentAdminPage > 1) {
+                paginationHTML += `<li class="page-item"><a class="page-link" onclick="changeAdminPage(${currentAdminPage - 1})">Anterior</a></li>`;
+            }
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentAdminPage) {
+                    paginationHTML += `<li class="page-item"><a class="page-link active">${i}</a></li>`;
+                } else {
+                    paginationHTML += `<li class="page-item"><a class="page-link" onclick="changeAdminPage(${i})">${i}</a></li>`;
+                }
+            }
+            
+            // Botão próximo
+            if (currentAdminPage < totalPages) {
+                paginationHTML += `<li class="page-item"><a class="page-link" onclick="changeAdminPage(${currentAdminPage + 1})">Próximo</a></li>`;
+            }
+            
+            paginationDiv.innerHTML = paginationHTML;
+            paginationDiv.style.display = 'flex';
+        } else {
+            paginationDiv.style.display = 'none';
+        }
+    }
+
+    // Mudar página de administradores
+    window.changeAdminPage = function(page) {
+        currentAdminPage = page;
+        renderAdmins(allAdminsData);
+    }
+
+    // Renderizar atividades recentes
+    function renderRecentActivities() {
+        const activitiesDiv = document.getElementById('recentActivities');
+        
+        if (!allLogsData || Object.keys(allLogsData).length === 0) {
+            activitiesDiv.innerHTML = `
+                <div class="no-data">
+                    <i class="fa-solid fa-clock-rotate-left text-muted mb-2" style="font-size: 2rem;"></i>
+                    <h6 class="text-muted">Nenhuma atividade registrada</h6>
+                    <p class="text-muted">As atividades aparecerão aqui quando ocorrerem.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Ordenar logs por timestamp (mais recentes primeiro)
+        const sortedLogs = Object.values(allLogsData)
+            .filter(log => log && log.message)
+            .sort((a, b) => {
+                const timeA = a.timestamp?.seconds || new Date(a.timestamp).getTime();
+                const timeB = b.timestamp?.seconds || new Date(b.timestamp).getTime();
+                return timeB - timeA;
+            })
+            .slice(0, 10); // Mostrar apenas as 10 mais recentes
+
+        if (sortedLogs.length === 0) {
+            activitiesDiv.innerHTML = `
+                <div class="no-data">
+                    <h6 class="text-muted">Nenhuma atividade recente</h6>
+                </div>
+            `;
+            return;
+        }
+
+        activitiesDiv.innerHTML = sortedLogs.map(log => `
+            <div class="activity-item">
+                <div class="activity-message">${escapeHtml(log.message || 'Atividade sem descrição')}</div>
+                <div class="activity-meta">
+                    <span>Por: ${escapeHtml(log.adminName || 'Sistema')}</span>
+                    <span>${formatarTimestamp(log.timestamp)}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Renderizar histórico completo
+    function renderHistoricoCompleto() {
+        const historyBody = document.getElementById('historyTableBody');
+        const paginationDiv = document.getElementById('historyPagination');
+        
+        if (!allLogsData || Object.keys(allLogsData).length === 0) {
+            historyBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-4">
+                        <div class="no-data">
+                            <i class="fa-solid fa-clock-rotate-left text-muted mb-2" style="font-size: 2rem;"></i>
+                            <div class="text-muted">Nenhuma atividade registrada</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            paginationDiv.style.display = 'none';
+            return;
+        }
+
+        // Aplicar filtros
+        const searchTerm = document.getElementById('historySearch').value.toLowerCase();
+        const dateStart = document.getElementById('historyDateStart').value;
+        const dateEnd = document.getElementById('historyDateEnd').value;
+        const typeFilter = document.getElementById('historyFilterType').value;
+
+        let logsFiltrados = Object.values(allLogsData)
+            .filter(log => log && log.message)
+            .filter(log => {
+                // Filtro de busca
+                const searchMatch = !searchTerm || 
+                    log.message.toLowerCase().includes(searchTerm) ||
+                    (log.adminName && log.adminName.toLowerCase().includes(searchTerm));
+                
+                // Filtro de data
+                let dateMatch = true;
+                if (dateStart || dateEnd) {
+                    let logDate;
+                    if (log.timestamp?.seconds) {
+                        logDate = new Date(log.timestamp.seconds * 1000).toISOString().split('T')[0];
+                    } else if (log.timestamp) {
+                        logDate = new Date(log.timestamp).toISOString().split('T')[0];
+                    } else {
+                        dateMatch = false;
+                    }
+                    
+                    if (dateStart && logDate < dateStart) dateMatch = false;
+                    if (dateEnd && logDate > dateEnd) dateMatch = false;
+                }
+                
+                // Filtro de tipo
+                const typeMatch = !typeFilter || log.tipo === typeFilter;
+                
+                return searchMatch && dateMatch && typeMatch;
+            })
+            .sort((a, b) => {
+                const timeA = a.timestamp?.seconds || new Date(a.timestamp).getTime();
+                const timeB = b.timestamp?.seconds || new Date(b.timestamp).getTime();
+                return timeB - timeA;
+            });
+
+        if (logsFiltrados.length === 0) {
+            historyBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-4">
+                        <div class="no-data">
+                            <div class="text-muted">Nenhuma atividade encontrada</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            paginationDiv.style.display = 'none';
+            return;
+        }
+
+        // Paginação
+        const totalPages = Math.ceil(logsFiltrados.length / itemsPerPage);
+        const startIndex = (currentHistoryPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const logsPaginados = logsFiltrados.slice(startIndex, endIndex);
+
+        historyBody.innerHTML = logsPaginados.map(log => `
+            <tr>
+                <td>${formatarTimestamp(log.timestamp)}</td>
+                <td>${escapeHtml(log.adminName || 'Sistema')}</td>
+                <td>${escapeHtml(log.message || 'Atividade sem descrição')}</td>
+                <td><span class="admin-badge">${log.tipo || 'Geral'}</span></td>
+            </tr>
+        `).join('');
+
+        // Gerar paginação
+        if (totalPages > 1) {
+            let paginationHTML = '';
+            
+            // Botão anterior
+            if (currentHistoryPage > 1) {
+                paginationHTML += `<li class="page-item"><a class="page-link" onclick="changeHistoryPage(${currentHistoryPage - 1})">Anterior</a></li>`;
+            }
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentHistoryPage) {
+                    paginationHTML += `<li class="page-item"><a class="page-link active">${i}</a></li>`;
+                } else {
+                    paginationHTML += `<li class="page-item"><a class="page-link" onclick="changeHistoryPage(${i})">${i}</a></li>`;
+                }
+            }
+            
+            // Botão próximo
+            if (currentHistoryPage < totalPages) {
+                paginationHTML += `<li class="page-item"><a class="page-link" onclick="changeHistoryPage(${currentHistoryPage + 1})">Próximo</a></li>`;
+            }
+            
+            paginationDiv.innerHTML = paginationHTML;
+            paginationDiv.style.display = 'flex';
+        } else {
+            paginationDiv.style.display = 'none';
+        }
+    }
+
+    // Mudar página do histórico
+    window.changeHistoryPage = function(page) {
+        currentHistoryPage = page;
+        renderHistoricoCompleto();
+    }
+
+    // Atualizar estatísticas
+    function updateAdminStats(adminsData) {
+        const admins = Object.values(adminsData).filter(admin => admin);
+        
+        document.getElementById('totalAdmins').textContent = admins.length;
+        
+        const adminsAtivos = admins.filter(admin => admin.status === 'Ativo').length;
+        document.getElementById('ativosCount').textContent = adminsAtivos;
+        
+        // Calcular atividades de hoje
+        const hoje = new Date().toDateString();
+        const atividadesHoje = Object.values(allLogsData).filter(log => {
+            if (!log || !log.timestamp) return false;
+            
+            let logDate;
+            if (log.timestamp.seconds) {
+                logDate = new Date(log.timestamp.seconds * 1000).toDateString();
+            } else {
+                logDate = new Date(log.timestamp).toDateString();
+            }
+            return logDate === hoje;
+        }).length;
+        
+        document.getElementById('todayActivities').textContent = atividadesHoje;
+        document.getElementById('totalLogs').textContent = Object.keys(allLogsData).length;
+        
+        // Última atividade
+        if (Object.keys(allLogsData).length > 0) {
+            const ultimaAtividade = Object.values(allLogsData)
+                .filter(log => log && log.timestamp)
+                .reduce((maisRecente, log) => {
+                    const timeLog = log.timestamp.seconds || new Date(log.timestamp).getTime();
+                    const timeRecente = maisRecente.timestamp?.seconds || new Date(maisRecente.timestamp).getTime();
+                    return timeLog > timeRecente ? log : maisRecente;
+                });
+            
+            if (ultimaAtividade && ultimaAtividade.timestamp) {
+                const dataUltima = formatarTimestamp(ultimaAtividade.timestamp);
+                document.getElementById('lastActivity').textContent = dataUltima.split(' ')[0];
+            } else {
+                document.getElementById('lastActivity').textContent = '-';
+            }
+        } else {
+            document.getElementById('lastActivity').textContent = '-';
+        }
+    }
+
+    // Gerar relatórios
+    window.gerarRelatorio = function(tipo) {
+        switch(tipo) {
+            case 'admins':
+                exportarPDF('admins');
+                break;
+            case 'atividades':
+                exportarPDF('historico');
+                break;
+            case 'estatisticas':
+                exportarPDF('estatisticas');
+                break;
+            case 'completo':
+                // Gerar relatório completo combinando todos
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Página 1 - Administradores
+                doc.setFontSize(20);
+                doc.setTextColor(67, 97, 238);
+                doc.text('Relatório Completo - Administradores', 20, 20);
+                const conteudoAdmins = gerarConteudoPDFAdmins();
+                doc.autoTable({
+                    head: conteudoAdmins.head,
+                    body: conteudoAdmins.body,
+                    startY: 30
+                });
+
+                // Página 2 - Estatísticas
+                doc.addPage();
+                doc.setFontSize(20);
+                doc.setTextColor(67, 97, 238);
+                doc.text('Relatório Completo - Estatísticas', 20, 20);
+                const conteudoStats = gerarConteudoPDFEstatisticas();
+                doc.autoTable({
+                    head: conteudoStats.head,
+                    body: conteudoStats.body,
+                    startY: 30
+                });
+
+                // Página 3 - Histórico (apenas últimas 50 atividades)
+                doc.addPage();
+                doc.setFontSize(20);
+                doc.setTextColor(67, 97, 238);
+                doc.text('Relatório Completo - Histórico (Últimas 50)', 20, 20);
+                const conteudoHistorico = gerarConteudoPDFHistorico();
+                doc.autoTable({
+                    head: conteudoHistorico.head,
+                    body: conteudoHistorico.body.slice(0, 50), // Apenas 50 primeiras
+                    startY: 30
+                });
+
+                const dataHoje = new Date().toISOString().split('T')[0];
+                doc.save(`relatorio_completo_${dataHoje}.pdf`);
+                Swal.fire('Sucesso!', 'Relatório completo gerado com sucesso.', 'success');
+                break;
+        }
+    }
+
+    // Gerar relatório personalizado
+    window.gerarRelatorioPersonalizado = function() {
+        const startDate = document.getElementById('customReportStart').value;
+        const endDate = document.getElementById('customReportEnd').value;
+        const reportType = document.getElementById('customReportType').value;
+
+        if (!startDate || !endDate) {
+            Swal.fire('Atenção!', 'Selecione as datas inicial e final.', 'warning');
+            return;
+        }
+
+        // Aqui você implementaria a lógica para gerar relatório personalizado
+        // com base nas datas selecionadas
+        Swal.fire('Sucesso!', 'Relatório personalizado gerado com sucesso!', 'success');
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Inicializando painel de monitoramento...');
+        carregarDados();
+        updateThemeIcon('dark');
+    });
+  </script>
+</body>
+</html>

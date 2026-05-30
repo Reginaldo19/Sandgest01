@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=yes">
+    <title>SandGest • Sistema de Gestão Escolar Completo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 1rem;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --input-bg: #ffffff;
+            --hover-bg: #f1f5f9;
+        }
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --sidebar-bg: #0f172a;
+            --input-bg: #1e293b;
+            --hover-bg: #334155;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .admin-profile {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .admin-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+        }
+        .admin-avatar i {
+            font-size: 2.5rem;
+            color: white;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--hover-bg);
+            color: var(--primary);
+        }
+        .content-area {
+            flex: 1;
+            margin-left: 0;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .mobile-header .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .content-area {
+                padding: 2rem;
+            }
+        }
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: translateX(0);
+                position: relative;
+            }
+            .mobile-header {
+                display: none;
+            }
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .stat-icon i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        .stat-card h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1rem;
+        }
+        .data-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+        .data-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .card-header-data {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .card-title-data {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .card-badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 2rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .card-badge.substituto {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        .card-info-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .card-info-row i {
+            width: 1.2rem;
+            color: var(--primary);
+        }
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .btn-icon {
+            background: none;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.75rem;
+        }
+        .btn-icon:hover {
+            background: var(--hover-bg);
+            color: var(--primary);
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .btn-outline-custom {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .filters-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .filters-bar .form-control,
+        .filters-bar .form-select {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.5rem 0.875rem;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 140px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--border-color);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--text-secondary);
+            transition: 0.2s;
+        }
+        .step.active .step-circle {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        .step.completed .step-circle {
+            background: var(--success);
+            color: white;
+        }
+        .step-label {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            display: block;
+            text-align: left;
+        }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1040;
+            display: none;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--border-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--warning);
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .security-badge {
+            background: linear-gradient(135deg, #f72585, #7209b7);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+        
+        .sidebar-brand .menubtn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="app">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <img src="logo.jpg" width="40" style="border-radius: 100%;">
+                    <span>SandGest</span>
+                    <button id="themeToggle" class="menubtn">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                </div>
+            </div>
+            <div class="admin-profile">
+                <div class="admin-avatar">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <div class="admin-info">
+                    <h5 id="admin-name">Carregando...</h5>
+                    <p id="admin-email">admin@escola.com</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" data-target="home" class="active">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-target="alunos">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Alunos</span>
+                </a>
+                <a href="#" data-target="professores">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Professores</span>
+                </a>
+                <a href="#" data-target="coordenadores">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>Coordenadores</span>
+                </a>
+                <a href="#" data-target="cursos">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Cursos</span>
+                </a>
+                <a href="#" data-target="turmas">
+                    <i class="fa-solid fa-people-group"></i>
+                    <span>Turmas</span>
+                </a>
+                <a href="#" data-target="disciplinas">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Disciplinas</span>
+                </a>
+                <a href="#" data-target="financeiro">
+                    <i class="fa-solid fa-coins"></i>
+                    <span>Financeiro</span>
+                </a>
+                <a href="#" data-target="config">
+                    <i class="fa-solid fa-sliders-h"></i>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="content-area">
+            <div class="mobile-header">
+                <button class="menu-btn" id="menuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h5 id="mobileTitle">Dashboard</h5>
+            </div>
+
+            <div id="screen-home">
+                <div class="stats-grid" id="dashboardStats"></div>
+                <div class="card-modern">
+                    <div class="card-title mb-3">Distribuição de Alunos por Turma</div>
+                    <canvas id="studentChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <div id="screen-alunos" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Alunos</div>
+                            <div class="card-subtitle text-secondary small">Gestão completa de estudantes</div>
+                        </div>
+                        <button id="btnAddAluno" class="btn-primary-custom">
+                            <i class="fa-solid fa-plus me-1"></i>Novo Aluno
+                        </button>
+                    </div>
+                    <div class="filters-bar">
+                        <input type="text" id="alunoSearch" placeholder="Buscar por nome, matrícula..." class="form-control">
+                        <select id="alunoFilterTurma" class="form-select">
+                            <option value="">Todas as turmas</option>
+                        </select>
+                        <button id="btnLimparFiltrosAluno" class="btn-outline-custom">Limpar</button>
+                    </div>
+                    <div id="alunoList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-professores" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Professores</div>
+                            <div class="card-subtitle text-secondary small">Corpo docente vinculado às disciplinas</div>
+                        </div>
+                        <button id="btnAddProf" class="btn-primary-custom">
+                            <i class="fa-solid fa-plus me-1"></i>Novo Professor
+                        </button>
+                    </div>
+                    <div class="filters-bar">
+                        <input type="text" id="profSearch" placeholder="Buscar por nome, disciplina..." class="form-control">
+                        <select id="profFilterDisciplina" class="form-select">
+                            <option value="">Todas as disciplinas</option>
+                        </select>
+                        <button id="btnLimparFiltrosProf" class="btn-outline-custom">Limpar</button>
+                    </div>
+                    <div id="profList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-coordenadores" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Coordenadores</div>
+                            <div class="card-subtitle text-secondary small">Coordenação pedagógica</div>
+                        </div>
+                        <button id="btnAddCoordenador" class="btn-primary-custom">
+                            <i class="fa-solid fa-plus me-1"></i>Novo Coordenador
+                        </button>
+                    </div>
+                    <div id="coordList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-cursos" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Cursos</div>
+                            <div class="card-subtitle text-secondary small">Cursos disponíveis</div>
+                        </div>
+                        <button id="btnAddCurso" class="btn-primary-custom">
+                            <i class="fa-solid fa-plus me-1"></i>Novo Curso
+                        </button>
+                    </div>
+                    <div id="cursoList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-turmas" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Turmas</div>
+                            <div class="card-subtitle text-secondary small">Organização das turmas</div>
+                        </div>
+                        <button id="btnAddTurma" class="btn-primary-custom">
+                            <i class="fa-solid fa-plus me-1"></i>Nova Turma
+                        </button>
+                    </div>
+                    <div id="turmaList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-disciplinas" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Disciplinas</div>
+                            <div class="card-subtitle text-secondary small">Matriz curricular</div>
+                        </div>
+                        <button id="btnAddDisciplina" class="btn-primary-custom">
+                            <i class="fa-solid fa-plus me-1"></i>Nova Disciplina
+                        </button>
+                    </div>
+                    <div id="disciplinaList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-financeiro" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-header-modern d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="card-title fw-bold">Financeiro</div>
+                            <div class="card-subtitle text-secondary small">Controle de mensalidades</div>
+                        </div>
+                        <button id="btnGerarMensalidades" class="btn-primary-custom">
+                            <i class="fa-solid fa-calendar-plus me-1"></i>Gerar Mensalidades
+                        </button>
+                    </div>
+                    <div class="filters-bar">
+                        <select id="filterStatus" class="form-select">
+                            <option value="">Todos status</option>
+                            <option value="Paga">Paga</option>
+                            <option value="Pendente">Pendente</option>
+                        </select>
+                        <input type="text" id="financeiroSearch" placeholder="Buscar aluno..." class="form-control">
+                        <button id="btnLimparFiltrosFinanceiro" class="btn-outline-custom">Limpar</button>
+                    </div>
+                    <div id="financeiroStats" class="stats-grid mb-3"></div>
+                    <div id="financeiroList" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <div id="screen-config" style="display:none;">
+                <div class="card-modern">
+                    <div class="card-title fw-bold mb-3">Configurações</div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Escola</label>
+                        <input type="text" id="configNomeEscola" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ano Letivo</label>
+                        <input type="number" id="configAnoLetivo" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mensalidade Padrão (KZ)</label>
+                        <input type="number" id="configValorMensalidade" class="form-control" value="25000">
+                    </div>
+                    <button id="btnSaveConfig" class="btn-primary-custom w-100 py-2">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, update, remove, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBImtt43SlMdLtAiNUY26qpikIhG8ozyrY",
+            authDomain: "escola-a907f.firebaseapp.com",
+            databaseURL: "https://escola-a907f-default-rtdb.firebaseio.com",
+            projectId: "escola-a907f",
+            storageBucket: "escola-a907f.firebasestorage.app",
+            messagingSenderId: "323325281431",
+            appId: "1:323325281431:web:8a6dab5572fe541abd15d2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.tipo !== 'Admin') {
+            location.href = 'index.html';
+        }
+
+        let currentAdminData = null;
+        let allAlunos = {};
+        let allProfessores = {};
+        let allCoordenadores = {};
+        let allCursos = {};
+        let allTurmas = {};
+        let allDisciplinas = {};
+        let allFinanceiro = {};
+
+        const SENHA_PADRAO = "escola123";
+
+        // Função para verificar senha de segurança do admin logado
+        async function verificarSenhaSegurancaAdmin() {
+            if (!currentAdminData) {
+                const adminRef = ref(db, 'Admin');
+                const snapshot = await get(adminRef);
+                const admins = snapshot.val() || {};
+                for (let id in admins) {
+                    if (admins[id].email === currentUser.email) {
+                        currentAdminData = { id: id, ...admins[id] };
+                        break;
+                    }
+                }
+            }
+            
+            if (!currentAdminData) {
+                Swal.fire('Erro', 'Não foi possível identificar o administrador logado.', 'error');
+                return false;
+            }
+            
+            const { value: senhaSeguranca } = await Swal.fire({
+                title: 'Verificação de Segurança Obrigatória',
+                html: `
+                    <div class="text-center mb-3">
+                        <i class="fa-solid fa-shield-haltered" style="font-size: 3rem; color: var(--primary);"></i>
+                        <p class="mt-2">Para realizar esta operação, é necessário confirmar sua <strong>senha de segurança</strong>.</p>
+                        <p class="small text-muted">A senha de segurança é diferente da senha de login e foi definida no cadastro do administrador.</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha de Segurança</label>
+                        <input type="password" id="senhaSegurancaInput" class="form-control" placeholder="Digite sua senha de segurança" required>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar Operação',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const senha = document.getElementById('senhaSegurancaInput')?.value;
+                    if (!senha) {
+                        Swal.showValidationMessage('Digite sua senha de segurança');
+                        return false;
+                    }
+                    return senha;
+                }
+            });
+            
+            if (!senhaSeguranca) {
+                return false;
+            }
+            
+            if (currentAdminData.admin_key !== senhaSeguranca) {
+                await Swal.fire({
+                    title: 'Acesso Negado!',
+                    text: 'Senha de segurança incorreta. Operação cancelada por motivos de segurança.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+            
+            return true;
+        }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return String(s).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showToast(title, icon = 'success') {
+            Swal.fire({
+                title: title,
+                icon: icon,
+                toast: true,
+                timer: 2000,
+                showConfirmButton: false,
+                position: 'top-end'
+            });
+        }
+
+        function gerarMatricula() {
+            return 'ALUNO' + new Date().getFullYear() + Math.floor(1000 + Math.random() * 9000);
+        }
+
+        function gerarIDProfessor() {
+            return 'PROF' + new Date().getFullYear() + Math.floor(100 + Math.random() * 900);
+        }
+
+        async function deleteItemWithSecurity(path, id, nome) {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            const result = await Swal.fire({
+                title: `Remover ${nome}?`,
+                text: 'Esta ação não pode ser desfeita',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Sim, remover'
+            });
+            
+            if (result.isConfirmed) {
+                await remove(ref(db, `${path}/${id}`));
+                showToast(`${nome} removido com sucesso`);
+            }
+        }
+
+        async function editItemWithSecurity(path, id, data, customHtml = '') {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            let html = `
+                <div class="mb-3">
+                    <label class="form-label">Nome Completo</label>
+                    <input id="editNome" class="form-control" value="${escapeHtml(data.nome)}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input id="editEmail" class="form-control" value="${escapeHtml(data.email || '')}">
+                </div>
+                ${customHtml}
+            `;
+            
+            const result = await Swal.fire({
+                title: 'Editar ' + (data.nome || 'Registro'),
+                html: html,
+                showCancelButton: true,
+                confirmButtonText: 'Salvar',
+                preConfirm: () => {
+                    return {
+                        nome: document.getElementById('editNome').value,
+                        email: document.getElementById('editEmail').value
+                    };
+                }
+            });
+            
+            if (result.value) {
+                await update(ref(db, `${path}/${id}`), {
+                    nome: result.value.nome,
+                    email: result.value.email
+                });
+                showToast('Atualizado com sucesso');
+            }
+        }
+
+        // ==================== CADASTRO DE PROFESSOR COM VERIFICAÇÃO DE SEGURANÇA ====================
+        document.getElementById('btnAddProf').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            if (Object.keys(allDisciplinas).length === 0) {
+                Swal.fire('Atenção', 'Cadastre pelo menos uma disciplina antes de vincular um professor.', 'warning');
+                return;
+            }
+            
+            let stepData = {};
+            
+            const step1 = await Swal.fire({
+                title: 'Novo Professor - Etapa 1 de 5',
+                html: `
+                    <div class="stepper">
+                        <div class="step active"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                        <div class="step"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                        <div class="step"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                        <div class="step"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                        <div class="step"><div class="step-circle">5</div><div class="step-label">Disciplina</div></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <label class="form-label me-3">
+                                <input type="radio" name="nivelProf" value="primario"> Ensino Primário (1ª à 9ª)
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label me-3">
+                                <input type="radio" name="nivelProf" value="medio"> Ensino Médio (10ª à 13ª)
+                            </label>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Próximo',
+                preConfirm: () => {
+                    const nivel = document.querySelector('input[name="nivelProf"]:checked')?.value;
+                    if (!nivel) {
+                        Swal.showValidationMessage('Selecione o nível de ensino');
+                        return false;
+                    }
+                    return { nivel: nivel };
+                }
+            });
+            
+            if (!step1.value) return;
+            stepData.nivel = step1.value.nivel;
+            
+            if (stepData.nivel === 'medio') {
+                const cursos = Object.entries(allCursos).map(([id, c]) => ({ id: c.nome, name: c.nome }));
+                if (cursos.length === 0) {
+                    Swal.fire('Atenção', 'Nenhum curso cadastrado. Cadastre um curso primeiro.', 'warning');
+                    return;
+                }
+                
+                const step2 = await Swal.fire({
+                    title: 'Etapa 2 de 5 - Selecione o Curso',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step active"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                            <div class="step"><div class="step-circle">5</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Curso *</label>
+                            <select id="cursoProf" class="form-select">
+                                ${cursos.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const curso = document.getElementById('cursoProf')?.value;
+                        if (!curso) {
+                            Swal.showValidationMessage('Selecione um curso');
+                            return false;
+                        }
+                        return { curso: curso };
+                    }
+                });
+                
+                if (!step2.value) return;
+                stepData.curso = step2.value.curso;
+                
+                const step3 = await Swal.fire({
+                    title: 'Etapa 3 de 5 - Selecione a Classe',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step active"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                            <div class="step"><div class="step-circle">5</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Classe *</label>
+                            <select id="classeProf" class="form-select">
+                                <option>10ª</option>
+                                <option>11ª</option>
+                                <option>12ª</option>
+                                <option>13ª</option>
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const classe = document.getElementById('classeProf')?.value;
+                        if (!classe) {
+                            Swal.showValidationMessage('Selecione uma classe');
+                            return false;
+                        }
+                        return { classe: classe };
+                    }
+                });
+                
+                if (!step3.value) return;
+                stepData.classe = step3.value.classe;
+                
+                const turmasFiltradas = Object.values(allTurmas).filter(t => 
+                    t.nivel === 'medio' && t.curso === stepData.curso && t.classe === stepData.classe
+                );
+                
+                if (turmasFiltradas.length === 0) {
+                    Swal.fire('Atenção', 'Nenhuma turma disponível para este curso e classe. Cadastre uma turma primeiro.', 'warning');
+                    return;
+                }
+                
+                const step4 = await Swal.fire({
+                    title: 'Etapa 4 de 5 - Selecione a Turma',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step completed"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step active"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                            <div class="step"><div class="step-circle">5</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Turma *</label>
+                            <select id="turmaProf" class="form-select">
+                                ${turmasFiltradas.map(t => `<option value="${t.id}" data-nome="${t.nomeCompleto || t.nome}">${t.nomeCompleto || t.nome}</option>`).join('')}
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const select = document.getElementById('turmaProf');
+                        const turmaId = select?.value;
+                        const turmaNome = select?.options[select.selectedIndex]?.dataset.nome;
+                        if (!turmaId) {
+                            Swal.showValidationMessage('Selecione uma turma');
+                            return false;
+                        }
+                        return { turmaId: turmaId, turmaNome: turmaNome };
+                    }
+                });
+                
+                if (!step4.value) return;
+                stepData.turmaId = step4.value.turmaId;
+                stepData.turmaNome = step4.value.turmaNome;
+                
+                const disciplinasFiltradas = Object.entries(allDisciplinas).filter(([id, d]) => {
+                    if (d.tipoDisciplina === 'global') return true;
+                    if (d.tipoDisciplina === 'medio' && d.curso === stepData.curso && d.classe === stepData.classe) return true;
+                    if (d.tipoDisciplina === 'primario' && d.classe === stepData.classe) return true;
+                    return false;
+                });
+                
+                if (disciplinasFiltradas.length === 0) {
+                    Swal.fire('Atenção', 'Nenhuma disciplina disponível para esta turma. Cadastre disciplinas primeiro.', 'warning');
+                    return;
+                }
+                
+                const step5 = await Swal.fire({
+                    title: 'Etapa 5 de 5 - Dados do Professor',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step completed"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step completed"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                            <div class="step active"><div class="step-circle">5</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Disciplina *</label>
+                            <select id="disciplinaProf" class="form-select">
+                                ${disciplinasFiltradas.map(([id, d]) => `<option value="${id}">${d.nome} (${d.cargaHoraria}h)</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Vínculo *</label>
+                            <select id="tipoVinculo" class="form-select">
+                                <option value="titular">Professor Titular</option>
+                                <option value="substituto">Professor Substituto</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações (opcional)</label>
+                            <textarea id="obsProf" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo *</label>
+                            <input id="nomeProf" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento</label>
+                            <input id="dataNascProf" type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">BI / NIF *</label>
+                            <input id="biProf" class="form-control" placeholder="Número do Bilhete de Identidade">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input id="emailProf" type="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone *</label>
+                            <input id="telProf" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Morada</label>
+                            <input id="moradaProf" class="form-control">
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Cadastrar',
+                    preConfirm: () => {
+                        const nome = document.getElementById('nomeProf')?.value;
+                        if (!nome) {
+                            Swal.showValidationMessage('Informe o nome do professor');
+                            return false;
+                        }
+                        
+                        const disciplinaId = document.getElementById('disciplinaProf')?.value;
+                        const disciplina = allDisciplinas[disciplinaId];
+                        const tipoVinculo = document.getElementById('tipoVinculo')?.value;
+                        
+                        return {
+                            idProfessor: gerarIDProfessor(),
+                            nome: nome,
+                            dataNascimento: document.getElementById('dataNascProf')?.value,
+                            bi: document.getElementById('biProf')?.value,
+                            email: document.getElementById('emailProf')?.value,
+                            telefone: document.getElementById('telProf')?.value,
+                            morada: document.getElementById('moradaProf')?.value,
+                            nivel: stepData.nivel,
+                            curso: stepData.curso,
+                            classe: stepData.classe,
+                            turmaId: stepData.turmaId,
+                            turmaNome: stepData.turmaNome,
+                            disciplinaId: disciplinaId,
+                            disciplinaNome: disciplina?.nome || 'N/A',
+                            tipoVinculo: tipoVinculo,
+                            observacoes: document.getElementById('obsProf')?.value || '',
+                            status: 'Ativo',
+                            password: SENHA_PADRAO
+                        };
+                    }
+                });
+                
+                if (step5.value) {
+                    await set(push(ref(db, 'professores')), { ...step5.value, createdAt: serverTimestamp() });
+                    Swal.fire({
+                        title: 'Professor Cadastrado',
+                        html: `
+                            <p><strong>ID:</strong> <code>${step5.value.idProfessor}</code></p>
+                            <p><strong>Disciplina:</strong> ${step5.value.disciplinaNome}</p>
+                            <p><strong>Turma:</strong> ${step5.value.turmaNome}</p>
+                            <p><strong>Vínculo:</strong> ${step5.value.tipoVinculo === 'titular' ? 'Professor Titular' : 'Professor Substituto'}</p>
+                            <p><strong>Senha:</strong> <code>${SENHA_PADRAO}</code></p>
+                        `,
+                        icon: 'success'
+                    });
+                }
+            } else {
+                const step2 = await Swal.fire({
+                    title: 'Etapa 2 de 4 - Selecione a Classe',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step active"><div class="step-circle">2</div><div class="step-label">Classe</div></div>
+                            <div class="step"><div class="step-circle">3</div><div class="step-label">Turma</div></div>
+                            <div class="step"><div class="step-circle">4</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Classe *</label>
+                            <select id="classeProfPrim" class="form-select">
+                                ${Array.from({length: 9}, (_, i) => `<option value="${i+1}ª">${i+1}ª Classe</option>`).join('')}
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const classe = document.getElementById('classeProfPrim')?.value;
+                        if (!classe) {
+                            Swal.showValidationMessage('Selecione uma classe');
+                            return false;
+                        }
+                        return { classe: classe };
+                    }
+                });
+                
+                if (!step2.value) return;
+                stepData.classe = step2.value.classe;
+                
+                const turmasFiltradas = Object.values(allTurmas).filter(t => 
+                    t.nivel === 'primario' && t.classe === stepData.classe
+                );
+                
+                if (turmasFiltradas.length === 0) {
+                    Swal.fire('Atenção', 'Nenhuma turma disponível para esta classe. Cadastre uma turma primeiro.', 'warning');
+                    return;
+                }
+                
+                const step3 = await Swal.fire({
+                    title: 'Etapa 3 de 4 - Selecione a Turma',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Classe</div></div>
+                            <div class="step active"><div class="step-circle">3</div><div class="step-label">Turma</div></div>
+                            <div class="step"><div class="step-circle">4</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Turma *</label>
+                            <select id="turmaProfPrim" class="form-select">
+                                ${turmasFiltradas.map(t => `<option value="${t.id}" data-nome="${t.nomeCompleto || t.nome}">${t.nomeCompleto || t.nome}</option>`).join('')}
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const select = document.getElementById('turmaProfPrim');
+                        const turmaId = select?.value;
+                        const turmaNome = select?.options[select.selectedIndex]?.dataset.nome;
+                        if (!turmaId) {
+                            Swal.showValidationMessage('Selecione uma turma');
+                            return false;
+                        }
+                        return { turmaId: turmaId, turmaNome: turmaNome };
+                    }
+                });
+                
+                if (!step3.value) return;
+                stepData.turmaId = step3.value.turmaId;
+                stepData.turmaNome = step3.value.turmaNome;
+                
+                const disciplinasFiltradas = Object.entries(allDisciplinas).filter(([id, d]) => {
+                    if (d.tipoDisciplina === 'global') return true;
+                    if (d.tipoDisciplina === 'primario' && d.classe === stepData.classe) return true;
+                    return false;
+                });
+                
+                if (disciplinasFiltradas.length === 0) {
+                    Swal.fire('Atenção', 'Nenhuma disciplina disponível para esta turma. Cadastre disciplinas primeiro.', 'warning');
+                    return;
+                }
+                
+                const step4 = await Swal.fire({
+                    title: 'Etapa 4 de 4 - Dados do Professor',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Classe</div></div>
+                            <div class="step completed"><div class="step-circle">3</div><div class="step-label">Turma</div></div>
+                            <div class="step active"><div class="step-circle">4</div><div class="step-label">Disciplina</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Disciplina *</label>
+                            <select id="disciplinaProfPrim" class="form-select">
+                                ${disciplinasFiltradas.map(([id, d]) => `<option value="${id}">${d.nome} (${d.cargaHoraria}h)</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Vínculo *</label>
+                            <select id="tipoVinculoPrim" class="form-select">
+                                <option value="titular">Professor Titular</option>
+                                <option value="substituto">Professor Substituto</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações (opcional)</label>
+                            <textarea id="obsProfPrim" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo *</label>
+                            <input id="nomeProf" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento</label>
+                            <input id="dataNascProf" type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">BI / NIF *</label>
+                            <input id="biProf" class="form-control" placeholder="Número do Bilhete de Identidade">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input id="emailProf" type="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone *</label>
+                            <input id="telProf" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Morada</label>
+                            <input id="moradaProf" class="form-control">
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Cadastrar',
+                    preConfirm: () => {
+                        const nome = document.getElementById('nomeProf')?.value;
+                        if (!nome) {
+                            Swal.showValidationMessage('Informe o nome do professor');
+                            return false;
+                        }
+                        
+                        const disciplinaId = document.getElementById('disciplinaProfPrim')?.value;
+                        const disciplina = allDisciplinas[disciplinaId];
+                        const tipoVinculo = document.getElementById('tipoVinculoPrim')?.value;
+                        
+                        return {
+                            idProfessor: gerarIDProfessor(),
+                            nome: nome,
+                            dataNascimento: document.getElementById('dataNascProf')?.value,
+                            bi: document.getElementById('biProf')?.value,
+                            email: document.getElementById('emailProf')?.value,
+                            telefone: document.getElementById('telProf')?.value,
+                            morada: document.getElementById('moradaProf')?.value,
+                            nivel: stepData.nivel,
+                            classe: stepData.classe,
+                            turmaId: stepData.turmaId,
+                            turmaNome: stepData.turmaNome,
+                            disciplinaId: disciplinaId,
+                            disciplinaNome: disciplina?.nome || 'N/A',
+                            tipoVinculo: tipoVinculo,
+                            observacoes: document.getElementById('obsProfPrim')?.value || '',
+                            status: 'Ativo',
+                            password: SENHA_PADRAO
+                        };
+                    }
+                });
+                
+                if (step4.value) {
+                    await set(push(ref(db, 'professores')), { ...step4.value, createdAt: serverTimestamp() });
+                    Swal.fire({
+                        title: 'Professor Cadastrado',
+                        html: `
+                            <p><strong>ID:</strong> <code>${step4.value.idProfessor}</code></p>
+                            <p><strong>Disciplina:</strong> ${step4.value.disciplinaNome}</p>
+                            <p><strong>Turma:</strong> ${step4.value.turmaNome}</p>
+                            <p><strong>Vínculo:</strong> ${step4.value.tipoVinculo === 'titular' ? 'Professor Titular' : 'Professor Substituto'}</p>
+                            <p><strong>Senha:</strong> <code>${SENHA_PADRAO}</code></p>
+                        `,
+                        icon: 'success'
+                    });
+                }
+            }
+        });
+
+        // ==================== CADASTRO DE ALUNO COM VERIFICAÇÃO ====================
+        document.getElementById('btnAddAluno').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            let stepData = {};
+            
+            const step1 = await Swal.fire({
+                title: 'Novo Aluno - Etapa 1 de 4',
+                html: `
+                    <div class="stepper">
+                        <div class="step active"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                        <div class="step"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                        <div class="step"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                        <div class="step"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <label class="form-label me-3">
+                                <input type="radio" name="nivelAluno" value="primario"> Ensino Primário (1ª à 9ª)
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label me-3">
+                                <input type="radio" name="nivelAluno" value="medio"> Ensino Médio (10ª à 13ª)
+                            </label>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Próximo',
+                preConfirm: () => {
+                    const nivel = document.querySelector('input[name="nivelAluno"]:checked')?.value;
+                    if (!nivel) {
+                        Swal.showValidationMessage('Selecione o nível de ensino');
+                        return false;
+                    }
+                    return { nivel: nivel };
+                }
+            });
+            
+            if (!step1.value) return;
+            stepData.nivel = step1.value.nivel;
+            
+            if (stepData.nivel === 'medio') {
+                const cursos = Object.entries(allCursos).map(([id, c]) => ({ id: c.nome, name: c.nome }));
+                if (cursos.length === 0) {
+                    Swal.fire('Atenção', 'Nenhum curso cadastrado. Cadastre um curso primeiro.', 'warning');
+                    return;
+                }
+                
+                const step2 = await Swal.fire({
+                    title: 'Etapa 2 de 4 - Selecione o Curso',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step active"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Curso *</label>
+                            <select id="cursoAluno" class="form-select">
+                                ${cursos.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const curso = document.getElementById('cursoAluno')?.value;
+                        if (!curso) {
+                            Swal.showValidationMessage('Selecione um curso');
+                            return false;
+                        }
+                        return { curso: curso };
+                    }
+                });
+                
+                if (!step2.value) return;
+                stepData.curso = step2.value.curso;
+                
+                const step3 = await Swal.fire({
+                    title: 'Etapa 3 de 4 - Selecione a Classe',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step active"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Classe *</label>
+                            <select id="classeAluno" class="form-select">
+                                <option>10ª</option>
+                                <option>11ª</option>
+                                <option>12ª</option>
+                                <option>13ª</option>
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const classe = document.getElementById('classeAluno')?.value;
+                        if (!classe) {
+                            Swal.showValidationMessage('Selecione uma classe');
+                            return false;
+                        }
+                        return { classe: classe };
+                    }
+                });
+                
+                if (!step3.value) return;
+                stepData.classe = step3.value.classe;
+                
+                const turmasFiltradas = Object.values(allTurmas).filter(t => 
+                    t.nivel === 'medio' && t.curso === stepData.curso && t.classe === stepData.classe
+                );
+                
+                if (turmasFiltradas.length === 0) {
+                    Swal.fire('Atenção', 'Nenhuma turma disponível para este curso e classe. Cadastre uma turma primeiro.', 'warning');
+                    return;
+                }
+                
+                const step4 = await Swal.fire({
+                    title: 'Etapa 4 de 4 - Dados do Aluno',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Curso</div></div>
+                            <div class="step completed"><div class="step-circle">3</div><div class="step-label">Classe</div></div>
+                            <div class="step active"><div class="step-circle">4</div><div class="step-label">Turma</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Turma *</label>
+                            <select id="turmaAluno" class="form-select">
+                                ${turmasFiltradas.map(t => `<option value="${t.nomeCompleto || t.nome}">${t.nomeCompleto || t.nome}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo *</label>
+                            <input id="nomeAluno" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento *</label>
+                            <input id="dataNascAluno" type="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">BI / Passaporte *</label>
+                            <input id="biAluno" class="form-control" placeholder="Número do Bilhete de Identidade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input id="emailAluno" type="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone do Encarregado *</label>
+                            <input id="telEncarregado" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Encarregado *</label>
+                            <input id="nomeEncarregado" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Morada Completa *</label>
+                            <input id="enderecoAluno" class="form-control" required>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Cadastrar',
+                    preConfirm: () => {
+                        const nome = document.getElementById('nomeAluno')?.value;
+                        if (!nome) {
+                            Swal.showValidationMessage('Informe o nome do aluno');
+                            return false;
+                        }
+                        
+                        return {
+                            matricula: gerarMatricula(),
+                            nome: nome,
+                            dataNascimento: document.getElementById('dataNascAluno')?.value,
+                            bi: document.getElementById('biAluno')?.value,
+                            email: document.getElementById('emailAluno')?.value,
+                            telefoneEncarregado: document.getElementById('telEncarregado')?.value,
+                            nomeEncarregado: document.getElementById('nomeEncarregado')?.value,
+                            endereco: document.getElementById('enderecoAluno')?.value,
+                            nivel: stepData.nivel,
+                            curso: stepData.curso,
+                            classe: stepData.classe,
+                            turma: document.getElementById('turmaAluno')?.value,
+                            status: 'Ativo',
+                            password: SENHA_PADRAO
+                        };
+                    }
+                });
+                
+                if (step4.value) {
+                    await set(push(ref(db, 'alunos')), { ...step4.value, createdAt: serverTimestamp() });
+                    Swal.fire({
+                        title: 'Aluno Cadastrado',
+                        html: `<p><strong>Matrícula:</strong> <code>${step4.value.matricula}</code></p><p><strong>Turma:</strong> ${step4.value.turma}</p><p><strong>Senha:</strong> <code>${SENHA_PADRAO}</code></p>`,
+                        icon: 'success'
+                    });
+                }
+            } else {
+                const step2 = await Swal.fire({
+                    title: 'Etapa 2 de 3 - Selecione a Classe',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step active"><div class="step-circle">2</div><div class="step-label">Classe</div></div>
+                            <div class="step"><div class="step-circle">3</div><div class="step-label">Turma</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Classe *</label>
+                            <select id="classeAlunoPrim" class="form-select">
+                                ${Array.from({length: 9}, (_, i) => `<option value="${i+1}ª">${i+1}ª Classe</option>`).join('')}
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Próximo',
+                    preConfirm: () => {
+                        const classe = document.getElementById('classeAlunoPrim')?.value;
+                        if (!classe) {
+                            Swal.showValidationMessage('Selecione uma classe');
+                            return false;
+                        }
+                        return { classe: classe };
+                    }
+                });
+                
+                if (!step2.value) return;
+                stepData.classe = step2.value.classe;
+                
+                const turmasFiltradas = Object.values(allTurmas).filter(t => 
+                    t.nivel === 'primario' && t.classe === stepData.classe
+                );
+                
+                if (turmasFiltradas.length === 0) {
+                    Swal.fire('Atenção', 'Nenhuma turma disponível para esta classe. Cadastre uma turma primeiro.', 'warning');
+                    return;
+                }
+                
+                const step3 = await Swal.fire({
+                    title: 'Etapa 3 de 3 - Dados do Aluno',
+                    html: `
+                        <div class="stepper">
+                            <div class="step completed"><div class="step-circle">1</div><div class="step-label">Nível</div></div>
+                            <div class="step completed"><div class="step-circle">2</div><div class="step-label">Classe</div></div>
+                            <div class="step active"><div class="step-circle">3</div><div class="step-label">Turma</div></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Turma *</label>
+                            <select id="turmaAlunoPrim" class="form-select">
+                                ${turmasFiltradas.map(t => `<option value="${t.nomeCompleto || t.nome}">${t.nomeCompleto || t.nome}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo *</label>
+                            <input id="nomeAluno" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento *</label>
+                            <input id="dataNascAluno" type="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">BI / Passaporte *</label>
+                            <input id="biAluno" class="form-control" placeholder="Número do Bilhete de Identidade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input id="emailAluno" type="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone do Encarregado *</label>
+                            <input id="telEncarregado" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Encarregado *</label>
+                            <input id="nomeEncarregado" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Morada Completa *</label>
+                            <input id="enderecoAluno" class="form-control" required>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Cadastrar',
+                    preConfirm: () => {
+                        const nome = document.getElementById('nomeAluno')?.value;
+                        if (!nome) {
+                            Swal.showValidationMessage('Informe o nome do aluno');
+                            return false;
+                        }
+                        
+                        return {
+                            matricula: gerarMatricula(),
+                            nome: nome,
+                            dataNascimento: document.getElementById('dataNascAluno')?.value,
+                            bi: document.getElementById('biAluno')?.value,
+                            email: document.getElementById('emailAluno')?.value,
+                            telefoneEncarregado: document.getElementById('telEncarregado')?.value,
+                            nomeEncarregado: document.getElementById('nomeEncarregado')?.value,
+                            endereco: document.getElementById('enderecoAluno')?.value,
+                            nivel: stepData.nivel,
+                            classe: stepData.classe,
+                            turma: document.getElementById('turmaAlunoPrim')?.value,
+                            status: 'Ativo',
+                            password: SENHA_PADRAO
+                        };
+                    }
+                });
+                
+                if (step3.value) {
+                    await set(push(ref(db, 'alunos')), { ...step3.value, createdAt: serverTimestamp() });
+                    Swal.fire({
+                        title: 'Aluno Cadastrado',
+                        html: `<p><strong>Matrícula:</strong> <code>${step3.value.matricula}</code></p><p><strong>Turma:</strong> ${step3.value.turma}</p><p><strong>Senha:</strong> <code>${SENHA_PADRAO}</code></p>`,
+                        icon: 'success'
+                    });
+                }
+            }
+        });
+
+        // ==================== CADASTRO DE TURMA COM VERIFICAÇÃO ====================
+        document.getElementById('btnAddTurma').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            const result = await Swal.fire({
+                title: 'Nova Turma',
+                html: `
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Turma *</label>
+                        <input id="nomeTurma" class="form-control" placeholder="Ex: A, B, C ou 10ª A">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nível de Ensino *</label>
+                        <select id="nivelTurma" class="form-select">
+                            <option value="primario">Ensino Primário (1ª à 9ª)</option>
+                            <option value="medio">Ensino Médio (10ª à 13ª)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="cursoDiv" style="display:none;">
+                        <label class="form-label">Curso *</label>
+                        <select id="cursoTurma" class="form-select">
+                            ${Object.entries(allCursos).map(([id, c]) => `<option value="${c.nome}">${c.nome}</option>`).join('') || '<option>Nenhum curso cadastrado</option>'}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Classe *</label>
+                        <select id="classeTurma" class="form-select">
+                            <option value="1ª">1ª Classe</option>
+                            <option value="2ª">2ª Classe</option>
+                            <option value="3ª">3ª Classe</option>
+                            <option value="4ª">4ª Classe</option>
+                            <option value="5ª">5ª Classe</option>
+                            <option value="6ª">6ª Classe</option>
+                            <option value="7ª">7ª Classe</option>
+                            <option value="8ª">8ª Classe</option>
+                            <option value="9ª">9ª Classe</option>
+                            <option value="10ª">10ª Classe</option>
+                            <option value="11ª">11ª Classe</option>
+                            <option value="12ª">12ª Classe</option>
+                            <option value="13ª">13ª Classe</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sala</label>
+                        <input id="salaTurma" class="form-control" placeholder="Ex: Sala 101">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Capacidade Máxima</label>
+                        <input id="capacidadeTurma" class="form-control" value="40" type="number">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Cadastrar',
+                didOpen: () => {
+                    const nivelSelect = document.getElementById('nivelTurma');
+                    const cursoDiv = document.getElementById('cursoDiv');
+                    nivelSelect.addEventListener('change', () => {
+                        cursoDiv.style.display = nivelSelect.value === 'medio' ? 'block' : 'none';
+                    });
+                },
+                preConfirm: () => {
+                    const nome = document.getElementById('nomeTurma')?.value;
+                    if (!nome) {
+                        Swal.showValidationMessage('Informe o nome da turma');
+                        return false;
+                    }
+                    
+                    const nivel = document.getElementById('nivelTurma')?.value;
+                    const classe = document.getElementById('classeTurma')?.value;
+                    
+                    let turmaData = {
+                        nome: nome,
+                        nivel: nivel,
+                        classe: classe,
+                        sala: document.getElementById('salaTurma')?.value,
+                        capacidade: parseInt(document.getElementById('capacidadeTurma')?.value) || 40
+                    };
+                    
+                    if (nivel === 'medio') {
+                        const curso = document.getElementById('cursoTurma')?.value;
+                        if (!curso || curso === 'Nenhum curso cadastrado') {
+                            Swal.showValidationMessage('Selecione um curso válido');
+                            return false;
+                        }
+                        turmaData.curso = curso;
+                        turmaData.nomeCompleto = `${curso} - ${classe} - Turma ${nome}`;
+                    } else {
+                        turmaData.nomeCompleto = `${classe} - Turma ${nome}`;
+                    }
+                    
+                    return turmaData;
+                }
+            });
+            
+            if (result.value) {
+                const newTurmaRef = push(ref(db, 'turmas'));
+                await set(newTurmaRef, { ...result.value, id: newTurmaRef.key, createdAt: serverTimestamp() });
+                showToast('Turma cadastrada com sucesso!');
+            }
+        });
+
+        // ==================== CADASTRO DE CURSO COM VERIFICAÇÃO ====================
+        document.getElementById('btnAddCurso').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            const result = await Swal.fire({
+                title: 'Novo Curso',
+                html: `
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Curso *</label>
+                        <input id="nomeCurso" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Duração (anos)</label>
+                        <input id="duracaoCurso" class="form-control" value="4" type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <textarea id="descCurso" class="form-control" rows="2"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Cadastrar',
+                preConfirm: () => {
+                    const nome = document.getElementById('nomeCurso')?.value;
+                    if (!nome) {
+                        Swal.showValidationMessage('Informe o nome do curso');
+                        return false;
+                    }
+                    return {
+                        nome: nome,
+                        duracao: parseInt(document.getElementById('duracaoCurso')?.value) || 4,
+                        descricao: document.getElementById('descCurso')?.value
+                    };
+                }
+            });
+            
+            if (result.value) {
+                await set(push(ref(db, 'cursos')), { ...result.value, createdAt: serverTimestamp() });
+                showToast('Curso cadastrado com sucesso!');
+            }
+        });
+
+        // ==================== CADASTRO DE COORDENADOR COM VERIFICAÇÃO ====================
+        document.getElementById('btnAddCoordenador').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            let tipo = '';
+            
+            const tipoResult = await Swal.fire({
+                title: 'Tipo de Coordenador',
+                input: 'select',
+                inputOptions: {
+                    'curso': 'Coordenador de Curso',
+                    'turma': 'Coordenador de Turma'
+                },
+                inputPlaceholder: 'Selecione o tipo',
+                showCancelButton: true,
+                confirmButtonText: 'Próximo'
+            });
+            
+            if (!tipoResult.value) return;
+            tipo = tipoResult.value;
+            
+            let extraHtml = '';
+            
+            if (tipo === 'curso') {
+                const cursos = Object.entries(allCursos).map(([id, c]) => `<option value="${c.nome}">${c.nome}</option>`).join('');
+                extraHtml = `
+                    <div class="mb-3">
+                        <label class="form-label">Curso Principal *</label>
+                        <select id="cursoPrincipal" class="form-select">${cursos || '<option>Nenhum curso cadastrado</option>'}</select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cursos Adicionais (máximo 2)</label>
+                        <select id="cursosAdicionais" class="form-select" multiple size="3">
+                            ${cursos}
+                        </select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
+                    </div>
+                `;
+            } else {
+                const turmas = Object.values(allTurmas).map(t => `<option value="${t.nomeCompleto || t.nome}">${t.nomeCompleto || t.nome}</option>`).join('');
+                extraHtml = `
+                    <div class="mb-3">
+                        <label class="form-label">Turma Principal *</label>
+                        <select id="turmaPrincipal" class="form-select">${turmas || '<option>Nenhuma turma cadastrada</option>'}</select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Turmas Adicionais (máximo 2)</label>
+                        <select id="turmasAdicionais" class="form-select" multiple size="3">
+                            ${turmas}
+                        </select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
+                    </div>
+                `;
+            }
+            
+            const dadosResult = await Swal.fire({
+                title: 'Dados do Coordenador',
+                html: `
+                    <div class="mb-3">
+                        <label class="form-label">Nome Completo *</label>
+                        <input id="nomeCoord" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input id="emailCoord" type="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefone *</label>
+                        <input id="telefoneCoord" class="form-control" required>
+                    </div>
+                    ${extraHtml}
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Cadastrar',
+                preConfirm: () => {
+                    const nome = document.getElementById('nomeCoord')?.value;
+                    if (!nome) {
+                        Swal.showValidationMessage('Informe o nome do coordenador');
+                        return false;
+                    }
+                    
+                    let principal = '';
+                    let adicionais = [];
+                    
+                    if (tipo === 'curso') {
+                        principal = document.getElementById('cursoPrincipal')?.value;
+                        adicionais = Array.from(document.getElementById('cursosAdicionais')?.selectedOptions || []).map(o => o.value);
+                    } else {
+                        principal = document.getElementById('turmaPrincipal')?.value;
+                        adicionais = Array.from(document.getElementById('turmasAdicionais')?.selectedOptions || []).map(o => o.value);
+                    }
+                    
+                    return {
+                        idCoordenador: 'COORD' + new Date().getFullYear() + Math.floor(100 + Math.random() * 900),
+                        nome: nome,
+                        email: document.getElementById('emailCoord')?.value,
+                        telefone: document.getElementById('telefoneCoord')?.value,
+                        tipoCoordenacao: tipo,
+                        itemPrincipal: principal,
+                        itensAdicionais: adicionais.slice(0, 2),
+                        password: SENHA_PADRAO,
+                        status: 'Ativo'
+                    };
+                }
+            });
+            
+            if (dadosResult.value) {
+                await set(push(ref(db, 'coordenadores')), { ...dadosResult.value, createdAt: serverTimestamp() });
+                Swal.fire({
+                    title: 'Coordenador Cadastrado',
+                    html: `<p><strong>ID:</strong> <code>${dadosResult.value.idCoordenador}</code></p><p><strong>Senha:</strong> <code>${SENHA_PADRAO}</code></p>`,
+                    icon: 'success'
+                });
+            }
+        });
+
+        // ==================== CADASTRO DE DISCIPLINA COM VERIFICAÇÃO ====================
+        document.getElementById('btnAddDisciplina').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            let stepData = {};
+            
+            const step1 = await Swal.fire({
+                title: 'Nova Disciplina - Tipo',
+                html: `
+                    <div class="mb-3">
+                        <label class="form-label me-3">
+                            <input type="radio" name="tipoDisc" value="global"> Global (Português, Matemática, etc)
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label me-3">
+                            <input type="radio" name="tipoDisc" value="primario"> Ensino Primário (por classe)
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label me-3">
+                            <input type="radio" name="tipoDisc" value="medio"> Ensino Médio (por curso e classe)
+                        </label>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Próximo',
+                preConfirm: () => {
+                    const tipo = document.querySelector('input[name="tipoDisc"]:checked')?.value;
+                    if (!tipo) {
+                        Swal.showValidationMessage('Selecione um tipo de disciplina');
+                        return false;
+                    }
+                    return { tipo: tipo };
+                }
+            });
+            
+            if (!step1.value) return;
+            stepData.tipo = step1.value.tipo;
+            
+            let extraHtml = '';
+            if (stepData.tipo === 'primario') {
+                extraHtml = `
+                    <div class="mb-3">
+                        <label class="form-label">Classe *</label>
+                        <select id="classeDisc" class="form-select">
+                            ${Array.from({length: 9}, (_, i) => `<option value="${i+1}ª">${i+1}ª Classe</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            } else if (stepData.tipo === 'medio') {
+                const cursos = Object.entries(allCursos).map(([id, c]) => `<option value="${c.nome}">${c.nome}</option>`).join('');
+                extraHtml = `
+                    <div class="mb-3">
+                        <label class="form-label">Curso *</label>
+                        <select id="cursoDisc" class="form-select">${cursos || '<option>Nenhum curso cadastrado</option>'}</select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Classe *</label>
+                        <select id="classeMedioDisc" class="form-select">
+                            <option>10ª</option>
+                            <option>11ª</option>
+                            <option>12ª</option>
+                            <option>13ª</option>
+                        </select>
+                    </div>
+                `;
+            }
+            
+            const step2 = await Swal.fire({
+                title: 'Dados da Disciplina',
+                html: `
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Disciplina *</label>
+                        <input id="nomeDisc" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Carga Horária (horas)</label>
+                        <input id="cargaDisc" class="form-control" value="60">
+                    </div>
+                    ${extraHtml}
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Cadastrar',
+                preConfirm: () => {
+                    const nome = document.getElementById('nomeDisc')?.value;
+                    if (!nome) {
+                        Swal.showValidationMessage('Informe o nome da disciplina');
+                        return false;
+                    }
+                    
+                    const dados = {
+                        nome: nome,
+                        cargaHoraria: parseInt(document.getElementById('cargaDisc')?.value) || 60,
+                        tipoDisciplina: stepData.tipo
+                    };
+                    
+                    if (stepData.tipo === 'primario') {
+                        dados.classe = document.getElementById('classeDisc')?.value;
+                    } else if (stepData.tipo === 'medio') {
+                        dados.curso = document.getElementById('cursoDisc')?.value;
+                        dados.classe = document.getElementById('classeMedioDisc')?.value;
+                    }
+                    
+                    return dados;
+                }
+            });
+            
+            if (step2.value) {
+                await set(push(ref(db, 'disciplinas')), { ...step2.value, createdAt: serverTimestamp() });
+                showToast('Disciplina cadastrada com sucesso!');
+            }
+        });
+
+        // ==================== GERAR MENSALIDADES COM VERIFICAÇÃO ====================
+        document.getElementById('btnGerarMensalidades').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            const valor = parseInt(document.getElementById('configValorMensalidade')?.value) || 25000;
+            const mes = new Date().toISOString().slice(0, 7);
+            const ativos = Object.values(allAlunos).filter(a => a.status === 'Ativo');
+            
+            if (ativos.length === 0) {
+                showToast('Nenhum aluno ativo encontrado', 'warning');
+                return;
+            }
+            
+            const result = await Swal.fire({
+                title: 'Gerar Mensalidades',
+                text: `Gerar mensalidades para ${ativos.length} alunos? Valor: ${valor.toLocaleString()} KZ (${mes})`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, gerar'
+            });
+            
+            if (result.isConfirmed) {
+                for (let a of ativos) {
+                    const alunoId = Object.keys(allAlunos).find(k => allAlunos[k] === a);
+                    await set(push(ref(db, 'financeiro')), {
+                        alunoId: alunoId,
+                        alunoNome: a.nome,
+                        valor: valor,
+                        dataVencimento: `${mes}-10`,
+                        mesReferencia: mes,
+                        status: 'Pendente',
+                        createdAt: serverTimestamp()
+                    });
+                }
+                showToast(`${ativos.length} mensalidades geradas com sucesso!`);
+            }
+        });
+
+        // ==================== SALVAR CONFIG COM VERIFICAÇÃO ====================
+        document.getElementById('btnSaveConfig').addEventListener('click', async () => {
+            const senhaValida = await verificarSenhaSegurancaAdmin();
+            if (!senhaValida) {
+                return;
+            }
+            
+            await set(ref(db, 'config'), {
+                nomeEscola: document.getElementById('configNomeEscola')?.value,
+                anoLetivo: parseInt(document.getElementById('configAnoLetivo')?.value),
+                valorMensalidade: parseInt(document.getElementById('configValorMensalidade')?.value)
+            });
+            showToast('Configurações salvas com sucesso!');
+        });
+
+        // ==================== RENDERIZAÇÕES E EVENTOS GLOBAIS ====================
+        function renderAlunos() {
+            const container = document.getElementById('alunoList');
+            if (!container) return;
+            
+            let filtered = Object.entries(allAlunos);
+            const search = document.getElementById('alunoSearch')?.value.toLowerCase();
+            if (search) {
+                filtered = filtered.filter(([_, a]) => a.nome?.toLowerCase().includes(search) || a.matricula?.includes(search));
+            }
+            
+            const turmaFilter = document.getElementById('alunoFilterTurma')?.value;
+            if (turmaFilter) {
+                filtered = filtered.filter(([_, a]) => a.turma === turmaFilter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-user-graduate"></i><p>Nenhum aluno encontrado</p></div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(([id, a]) => `
+                <div class="data-card">
+                    <div class="card-header-data">
+                        <div class="card-title-data">
+                            <div>
+                                <strong>${escapeHtml(a.nome)}</strong>
+                                <br>
+                                <small>Matrícula: ${a.matricula}</small>
+                            </div>
+                        </div>
+                        <span class="card-badge">${a.nivel === 'primario' ? 'Primário' : 'Médio'}</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-chalkboard"></i>
+                            <span><strong>Turma:</strong> ${a.turma || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span><strong>Classe:</strong> ${a.classe || 'N/A'}</span>
+                        </div>
+                        ${a.curso ? `<div class="card-info-row"><i class="fa-solid fa-graduation-cap"></i><span><strong>Curso:</strong> ${a.curso}</span></div>` : ''}
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-calendar"></i>
+                            <span><strong>Nascimento:</strong> ${a.dataNascimento || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-id-card"></i>
+                            <span><strong>BI:</strong> ${a.bi || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-phone"></i>
+                            <span><strong>Encarregado Tel:</strong> ${a.telefoneEncarregado || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-user"></i>
+                            <span><strong>Encarregado:</strong> ${a.nomeEncarregado || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span><strong>Morada:</strong> ${escapeHtml(a.endereco || 'N/A')}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon" data-action="editAluno" data-id="${id}">
+                            <i class="fa-regular fa-pen-to-square"></i> Editar
+                        </button>
+                        <button class="btn-icon danger" data-action="delete" data-type="Aluno" data-id="${id}" data-path="alunos">
+                            <i class="fa-regular fa-trash-can"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProfessores() {
+            const container = document.getElementById('profList');
+            if (!container) return;
+            
+            let items = Object.entries(allProfessores);
+            
+            const search = document.getElementById('profSearch')?.value.toLowerCase();
+            if (search) {
+                items = items.filter(([_, p]) => 
+                    p.nome?.toLowerCase().includes(search) || 
+                    p.disciplinaNome?.toLowerCase().includes(search) ||
+                    p.turmaNome?.toLowerCase().includes(search)
+                );
+            }
+            
+            const disciplinaFilter = document.getElementById('profFilterDisciplina')?.value;
+            if (disciplinaFilter) {
+                items = items.filter(([_, p]) => p.disciplinaNome === disciplinaFilter);
+            }
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-chalkboard-user"></i><p>Nenhum professor encontrado</p></div>';
+                return;
+            }
+            
+            container.innerHTML = items.map(([id, p]) => `
+                <div class="data-card">
+                    <div class="card-header-data">
+                        <div class="card-title-data">
+                            <div>
+                                <strong>${escapeHtml(p.nome)}</strong>
+                                <br>
+                                <small>ID: ${p.idProfessor}</small>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="card-badge ${p.tipoVinculo === 'substituto' ? 'substituto' : ''}">
+                                ${p.tipoVinculo === 'titular' ? 'Titular' : 'Substituto'}
+                            </span>
+                            <span class="card-badge">${p.nivel === 'primario' ? 'Primário' : 'Médio'}</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-book"></i>
+                            <span><strong>Disciplina:</strong> ${p.disciplinaNome || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-chalkboard"></i>
+                            <span><strong>Turma:</strong> ${p.turmaNome || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span><strong>Classe:</strong> ${p.classe || 'N/A'}</span>
+                        </div>
+                        ${p.curso ? `<div class="card-info-row"><i class="fa-solid fa-graduation-cap"></i><span><strong>Curso:</strong> ${p.curso}</span></div>` : ''}
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-id-card"></i>
+                            <span><strong>BI:</strong> ${p.bi || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-phone"></i>
+                            <span><strong>Telefone:</strong> ${p.telefone || 'N/A'}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <i class="fa-regular fa-envelope"></i>
+                            <span><strong>Email:</strong> ${escapeHtml(p.email || 'N/A')}</span>
+                        </div>
+                        ${p.observacoes ? `<div class="card-info-row"><i class="fa-solid fa-note-sticky"></i><span><strong>Obs:</strong> ${escapeHtml(p.observacoes)}</span></div>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon" data-action="editProf" data-id="${id}">
+                            <i class="fa-regular fa-pen-to-square"></i> Editar
+                        </button>
+                        <button class="btn-icon danger" data-action="delete" data-type="Professor" data-id="${id}" data-path="professores">
+                            <i class="fa-regular fa-trash-can"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCoordenadores() {
+            const container = document.getElementById('coordList');
+            if (!container) return;
+            const items = Object.entries(allCoordenadores);
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-user-tie"></i><p>Nenhum coordenador encontrado</p></div>';
+                return;
+            }
+            container.innerHTML = items.map(([id, c]) => `
+                <div class="data-card">
+                    <div class="card-header-data">
+                        <div class="card-title-data">
+                            <strong>${escapeHtml(c.nome)}</strong>
+                            <br><small>ID: ${c.idCoordenador}</small>
+                        </div>
+                        <span class="card-badge">${c.tipoCoordenacao === 'curso' ? 'Coord. Curso' : 'Coord. Turma'}</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info-row">
+                            <i class="fa-solid fa-${c.tipoCoordenacao === 'curso' ? 'graduation-cap' : 'people-group'}"></i>
+                            <span>Principal: ${c.itemPrincipal}</span>
+                        </div>
+                        ${c.itensAdicionais && c.itensAdicionais.length ? `<div class="card-info-row"><i class="fa-solid fa-plus"></i><span>Adicionais: ${c.itensAdicionais.join(', ')}</span></div>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon danger" data-action="delete" data-type="Coordenador" data-id="${id}" data-path="coordenadores">
+                            <i class="fa-regular fa-trash-can"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCursos() {
+            const container = document.getElementById('cursoList');
+            if (!container) return;
+            const items = Object.entries(allCursos);
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-graduation-cap"></i><p>Nenhum curso encontrado</p></div>';
+                return;
+            }
+            container.innerHTML = items.map(([id, c]) => `
+                <div class="data-card">
+                    <div class="card-header-data">
+                        <div class="card-title-data">
+                            <strong>${escapeHtml(c.nome)}</strong>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info-row"><i class="fa-regular fa-clock"></i><span>Duração: ${c.duracao || 4} anos</span></div>
+                        ${c.descricao ? `<div class="card-info-row"><i class="fa-regular fa-file-lines"></i><span>${escapeHtml(c.descricao)}</span></div>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon danger" data-action="delete" data-type="Curso" data-id="${id}" data-path="cursos">
+                            <i class="fa-regular fa-trash-can"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTurmas() {
+            const container = document.getElementById('turmaList');
+            if (!container) return;
+            const items = Object.entries(allTurmas);
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-people-group"></i><p>Nenhuma turma encontrada</p></div>';
+                return;
+            }
+            container.innerHTML = items.map(([id, t]) => `
+                <div class="data-card">
+                    <div class="card-header-data">
+                        <div class="card-title-data">
+                            <strong>${escapeHtml(t.nomeCompleto || t.nome)}</strong>
+                        </div>
+                        <span class="card-badge">${t.nivel === 'primario' ? 'Primário' : 'Médio'}</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info-row"><i class="fa-solid fa-layer-group"></i><span>Classe: ${t.classe}</span></div>
+                        ${t.curso ? `<div class="card-info-row"><i class="fa-solid fa-graduation-cap"></i><span>Curso: ${t.curso}</span></div>` : ''}
+                        <div class="card-info-row"><i class="fa-solid fa-door-open"></i><span>Sala: ${t.sala || 'N/A'}</span></div>
+                        <div class="card-info-row"><i class="fa-solid fa-users"></i><span>Capacidade: ${t.capacidade || 40}</span></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon danger" data-action="delete" data-type="Turma" data-id="${id}" data-path="turmas">
+                            <i class="fa-regular fa-trash-can"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDisciplinas() {
+            const container = document.getElementById('disciplinaList');
+            if (!container) return;
+            const items = Object.entries(allDisciplinas);
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-book-open"></i><p>Nenhuma disciplina encontrada</p></div>';
+                return;
+            }
+            container.innerHTML = items.map(([id, d]) => `
+                <div class="data-card">
+                    <div class="card-header-data">
+                        <div class="card-title-data">
+                            <strong>${escapeHtml(d.nome)}</strong>
+                        </div>
+                        <span class="card-badge">${d.tipoDisciplina === 'global' ? 'Global' : (d.tipoDisciplina === 'primario' ? 'Primário' : 'Médio')}</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info-row"><i class="fa-regular fa-clock"></i><span>Carga: ${d.cargaHoraria || 60}h</span></div>
+                        ${d.classe ? `<div class="card-info-row"><i class="fa-solid fa-layer-group"></i><span>Classe: ${d.classe}</span></div>` : ''}
+                        ${d.curso ? `<div class="card-info-row"><i class="fa-solid fa-graduation-cap"></i><span>Curso: ${d.curso}</span></div>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon danger" data-action="delete" data-type="Disciplina" data-id="${id}" data-path="disciplinas">
+                            <i class="fa-regular fa-trash-can"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderFinanceiro() {
+            const container = document.getElementById('financeiroList');
+            if (!container) return;
+            
+            let filtered = Object.entries(allFinanceiro);
+            const statusFilter = document.getElementById('filterStatus')?.value;
+            if (statusFilter) {
+                filtered = filtered.filter(([_, m]) => m.status === statusFilter);
+            }
+            
+            const search = document.getElementById('financeiroSearch')?.value.toLowerCase();
+            if (search) {
+                filtered = filtered.filter(([_, m]) => m.alunoNome?.toLowerCase().includes(search));
+            }
+            
+            let totalRecebido = 0;
+            let totalPendente = 0;
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-coins"></i><p>Nenhuma mensalidade encontrada</p></div>';
+            } else {
+                container.innerHTML = filtered.map(([id, m]) => {
+                    if (m.status === 'Paga') totalRecebido += m.valor;
+                    else totalPendente++;
+                    
+                    return `
+                        <div class="data-card">
+                            <div class="card-header-data">
+                                <div class="card-title-data">
+                                    <strong>${escapeHtml(m.alunoNome)}</strong>
+                                </div>
+                                <span class="card-badge">${m.status}</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-info-row"><i class="fa-solid fa-money-bill"></i><span>Valor: ${m.valor?.toLocaleString()} KZ</span></div>
+                                <div class="card-info-row"><i class="fa-regular fa-calendar"></i><span>Vencimento: ${m.dataVencimento}</span></div>
+                                ${m.dataPagamento ? `<div class="card-info-row"><i class="fa-solid fa-check-circle"></i><span>Pago em: ${m.dataPagamento}</span></div>` : ''}
+                            </div>
+                            <div class="card-actions">
+                                ${m.status !== 'Paga' ? `<button class="btn-icon success" data-action="pay" data-id="${id}"><i class="fa-solid fa-check-circle"></i> Pagar</button>` : ''}
+                                <button class="btn-icon danger" data-action="delete" data-type="Financeiro" data-id="${id}" data-path="financeiro">
+                                    <i class="fa-regular fa-trash-can"></i> Excluir
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            const statsDiv = document.getElementById('financeiroStats');
+            if (statsDiv) {
+                statsDiv.innerHTML = `
+                    <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div><h3>${totalRecebido.toLocaleString()} KZ</h3><p>Total Recebido</p></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div><h3>${totalPendente}</h3><p>Pendentes</p></div>
+                `;
+            }
+        }
+
+        function updateDashboard() {
+            const statsDiv = document.getElementById('dashboardStats');
+            if (statsDiv) {
+                statsDiv.innerHTML = `
+                    <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-user-graduate"></i></div><h3>${Object.keys(allAlunos).length}</h3><p>Alunos</p></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-chalkboard-user"></i></div><h3>${Object.keys(allProfessores).length}</h3><p>Professores</p></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-user-tie"></i></div><h3>${Object.keys(allCoordenadores).length}</h3><p>Coordenadores</p></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-people-group"></i></div><h3>${Object.keys(allTurmas).length}</h3><p>Turmas</p></div>
+                `;
+            }
+        }
+
+        function popularFiltros() {
+            const turmaSelect = document.getElementById('alunoFilterTurma');
+            if (turmaSelect) {
+                const options = Object.values(allTurmas).map(t => `<option value="${t.nomeCompleto || t.nome}">${t.nomeCompleto || t.nome}</option>`).join('');
+                turmaSelect.innerHTML = `<option value="">Todas as turmas</option>${options}`;
+            }
+            
+            const profFiltroSelect = document.getElementById('profFilterDisciplina');
+            if (profFiltroSelect) {
+                const disciplinasUnicas = new Set();
+                Object.values(allProfessores).forEach(p => {
+                    if (p.disciplinaNome) disciplinasUnicas.add(p.disciplinaNome);
+                });
+                const options = Array.from(disciplinasUnicas).map(d => `<option value="${d}">${d}</option>`).join('');
+                profFiltroSelect.innerHTML = `<option value="">Todas as disciplinas</option>${options}`;
+            }
+        }
+
+        // ==================== EVENTOS GLOBAIS COM SEGURANÇA ====================
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            
+            const action = btn.dataset.action;
+            const id = btn.dataset.id;
+            const path = btn.dataset.path;
+            const type = btn.dataset.type;
+            
+            if (action === 'delete' && id && path) {
+                await deleteItemWithSecurity(path, id, type || 'item');
+            }
+            
+            if (action === 'editProf' && id) {
+                const p = allProfessores[id];
+                if (p) {
+                    await editItemWithSecurity('professores', id, p, `
+                        <div class="mb-3"><label class="form-label">Telefone</label><input id="editTelefone" class="form-control" value="${escapeHtml(p.telefone || '')}"></div>
+                        <div class="mb-3"><label class="form-label">BI</label><input id="editBi" class="form-control" value="${escapeHtml(p.bi || '')}"></div>
+                        <div class="mb-3"><label class="form-label">Morada</label><input id="editMorada" class="form-control" value="${escapeHtml(p.morada || '')}"></div>
+                        <div class="mb-3"><label class="form-label">Observações</label><input id="editObs" class="form-control" value="${escapeHtml(p.observacoes || '')}"></div>
+                    `);
+                }
+            }
+            
+            if (action === 'editAluno' && id) {
+                const a = allAlunos[id];
+                if (a) {
+                    await editItemWithSecurity('alunos', id, a, `
+                        <div class="mb-3"><label class="form-label">Telefone Encarregado</label><input id="editTel" class="form-control" value="${escapeHtml(a.telefoneEncarregado || '')}"></div>
+                        <div class="mb-3"><label class="form-label">Nome Encarregado</label><input id="editNomeEnc" class="form-control" value="${escapeHtml(a.nomeEncarregado || '')}"></div>
+                        <div class="mb-3"><label class="form-label">Morada</label><input id="editEnd" class="form-control" value="${escapeHtml(a.endereco || '')}"></div>
+                        <div class="mb-3"><label class="form-label">BI</label><input id="editBi" class="form-control" value="${escapeHtml(a.bi || '')}"></div>
+                    `);
+                }
+            }
+            
+            if (action === 'pay' && id) {
+                const senhaValida = await verificarSenhaSegurancaAdmin();
+                if (!senhaValida) {
+                    return;
+                }
+                
+                const result = await Swal.fire({
+                    title: 'Registrar Pagamento',
+                    html: `<input id="dataPagamento" type="date" class="form-control" value="${new Date().toISOString().split('T')[0]}">`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar Pagamento'
+                });
+                
+                if (result.isConfirmed) {
+                    await update(ref(db, `financeiro/${id}`), {
+                        status: 'Paga',
+                        dataPagamento: document.getElementById('dataPagamento')?.value || new Date().toISOString().split('T')[0],
+                        updatedAt: serverTimestamp()
+                    });
+                    showToast('Pagamento registrado com sucesso!');
+                }
+            }
+        });
+
+        // ==================== FILTROS ====================
+        document.getElementById('btnLimparFiltrosAluno')?.addEventListener('click', () => {
+            if (document.getElementById('alunoSearch')) document.getElementById('alunoSearch').value = '';
+            if (document.getElementById('alunoFilterTurma')) document.getElementById('alunoFilterTurma').value = '';
+            renderAlunos();
+        });
+        
+        document.getElementById('btnLimparFiltrosFinanceiro')?.addEventListener('click', () => {
+            if (document.getElementById('filterStatus')) document.getElementById('filterStatus').value = '';
+            if (document.getElementById('financeiroSearch')) document.getElementById('financeiroSearch').value = '';
+            renderFinanceiro();
+        });
+        
+        document.getElementById('btnLimparFiltrosProf')?.addEventListener('click', () => {
+            if (document.getElementById('profSearch')) document.getElementById('profSearch').value = '';
+            if (document.getElementById('profFilterDisciplina')) document.getElementById('profFilterDisciplina').value = '';
+            renderProfessores();
+        });
+        
+        document.getElementById('alunoSearch')?.addEventListener('input', renderAlunos);
+        document.getElementById('alunoFilterTurma')?.addEventListener('change', renderAlunos);
+        document.getElementById('filterStatus')?.addEventListener('change', renderFinanceiro);
+        document.getElementById('financeiroSearch')?.addEventListener('input', renderFinanceiro);
+        document.getElementById('profSearch')?.addEventListener('input', renderProfessores);
+        document.getElementById('profFilterDisciplina')?.addEventListener('change', renderProfessores);
+
+        // ==================== NAVEGAÇÃO ====================
+        document.querySelectorAll('.sidebar-nav a').forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                a.classList.add('active');
+                
+                const target = a.dataset.target;
+                document.querySelectorAll('[id^="screen-"]').forEach(s => s.style.display = 'none');
+                document.getElementById(`screen-${target}`).style.display = 'block';
+                document.getElementById('mobileTitle').innerText = a.querySelector('span').innerText;
+                
+                if (window.innerWidth < 992) {
+                    document.getElementById('sidebar').classList.remove('open');
+                    document.getElementById('overlay').style.display = 'none';
+                }
+            });
+        });
+
+        // ==================== MENU MOBILE ====================
+        document.getElementById('menuBtn')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+        });
+        
+        document.getElementById('overlay')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').style.display = 'none';
+        });
+
+        // ==================== TEMA ====================
+        let savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.innerHTML = `<i class="fa-solid ${savedTheme === 'dark' ? 'fa-moon' : 'fa-sun'}"></i>`;
+            themeToggle.addEventListener('click', () => {
+                let th = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                document.body.setAttribute('data-theme', th);
+                localStorage.setItem('theme', th);
+                themeToggle.innerHTML = `<i class="fa-solid ${th === 'dark' ? 'fa-moon' : 'fa-sun'}"></i>`;
+            });
+        }
+
+        // ==================== DADOS DO USUÁRIO ====================
+        if (currentUser) {
+            const adminName = document.getElementById('admin-name');
+            const adminEmail = document.getElementById('admin-email');
+            if (adminName) adminName.textContent = currentUser.nome || 'Administrador';
+            if (adminEmail) adminEmail.textContent = currentUser.email || 'admin@escola.com';
+            
+            // Carregar dados do admin atual
+            const adminRef = ref(db, 'Admin');
+            const snapshot = await get(adminRef);
+            const admins = snapshot.val() || {};
+            for (let id in admins) {
+                if (admins[id].email === currentUser.email) {
+                    currentAdminData = { id: id, ...admins[id] };
+                    break;
+                }
+            }
+        }
+
+        // ==================== FIREBASE LISTENERS ====================
+        onValue(ref(db, 'alunos'), (snap) => {
+            allAlunos = snap.val() || {};
+            renderAlunos();
+            updateDashboard();
+            popularFiltros();
+        });
+        
+        onValue(ref(db, 'professores'), (snap) => {
+            allProfessores = snap.val() || {};
+            renderProfessores();
+            updateDashboard();
+            popularFiltros();
+        });
+        
+        onValue(ref(db, 'coordenadores'), (snap) => {
+            allCoordenadores = snap.val() || {};
+            renderCoordenadores();
+            updateDashboard();
+        });
+        
+        onValue(ref(db, 'cursos'), (snap) => {
+            allCursos = snap.val() || {};
+            renderCursos();
+            updateDashboard();
+        });
+        
+        onValue(ref(db, 'turmas'), (snap) => {
+            allTurmas = snap.val() || {};
+            renderTurmas();
+            updateDashboard();
+            popularFiltros();
+        });
+        
+        onValue(ref(db, 'disciplinas'), (snap) => {
+            allDisciplinas = snap.val() || {};
+            renderDisciplinas();
+        });
+        
+        onValue(ref(db, 'financeiro'), (snap) => {
+            allFinanceiro = snap.val() || {};
+            renderFinanceiro();
+        });
+        
+        onValue(ref(db, 'config'), (snap) => {
+            if (snap.exists()) {
+                const c = snap.val();
+                const nomeEscola = document.getElementById('configNomeEscola');
+                const anoLetivo = document.getElementById('configAnoLetivo');
+                const valorMensalidade = document.getElementById('configValorMensalidade');
+                if (nomeEscola) nomeEscola.value = c.nomeEscola || '';
+                if (anoLetivo) anoLetivo.value = c.anoLetivo || '';
+                if (valorMensalidade) valorMensalidade.value = c.valorMensalidade || 25000;
+            }
+        });
+    </script>
+</body>
+</html>

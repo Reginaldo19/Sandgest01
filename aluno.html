@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=yes" />
+  <title>Aluno • Boletim Escolar Angola</title>
+  <!-- Bootstrap + Font Awesome + Google Fonts + Chart.js + SweetAlert -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --radius: 1rem;
+    }
+    [data-theme="light"] {
+      --bg-primary: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --border-color: #e2e8f0;
+      --sidebar-bg: #ffffff;
+      --input-bg: #ffffff;
+      --hover-bg: #f1f5f9;
+      --chat-bg: #f8fafc;
+    }
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border-color: #334155;
+      --sidebar-bg: #0f172a;
+      --input-bg: #1e293b;
+      --hover-bg: #334155;
+      --chat-bg: #1a2332;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      z-index: 1050;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .aluno-profile {
+      padding: 1.25rem;
+      margin: 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      text-align: center;
+    }
+    .aluno-avatar {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.75rem;
+    }
+    .aluno-avatar i { font-size: 2.5rem; color: white; }
+    .aluno-name { font-weight: 700; font-size: 1.1rem; }
+    .aluno-email { font-size: 0.75rem; color: var(--text-secondary); }
+    .turma-badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 2rem;
+      font-size: 0.7rem;
+      margin-top: 0.5rem;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: var(--hover-bg);
+      color: var(--primary);
+    }
+    .content-area {
+      flex: 1;
+      margin-left: 0;
+      padding: 1.5rem;
+      width: 100%;
+    }
+    @media (min-width: 992px) {
+      .sidebar { transform: translateX(0); position: relative; }
+      .mobile-header { display: none; }
+    }
+    .mobile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .mobile-header .menu-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+    .card-modern {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.25rem; }
+    .card-subtitle { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .stat-card h3 { font-size: 1.8rem; font-weight: 700; margin: 0.5rem 0; }
+    .badge-success { background: var(--success); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .badge-warning { background: var(--warning); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .badge-danger { background: var(--danger); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .badge-info { background: var(--info); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .table-responsive { overflow-x: auto; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 0.85rem; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+    .table th { font-weight: 600; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .professor-chip {
+      background: var(--hover-bg);
+      border-radius: 2rem;
+      padding: 0.25rem 0.75rem;
+      display: inline-block;
+      margin: 0.2rem 0.3rem;
+      font-size: 0.75rem;
+    }
+    .chat-messages-area {
+      height: 60vh;
+      overflow-y: auto;
+      background: var(--chat-bg);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .chat-message {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-message.received { align-items: flex-start; }
+    .message-bubble {
+      max-width: 80%;
+      padding: 0.75rem 1rem;
+      border-radius: 1.25rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+    }
+    .message-meta {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1040;
+      display: none;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--border-color); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+    .boletim-ano { font-weight: 700; margin-top: 1rem; }
+    .media-final { font-weight: 800; }
+    .situacao { font-weight: 600; }
+  </style>
+</head>
+<body data-theme="dark">
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header"><div class="sidebar-brand">
+      <img src="logo.jpg" width="80" style="border-radius: 100%;">
+      <span>EduTrack</span></div></div>
+    <div class="aluno-profile">
+      <div class="aluno-avatar"><i class="fa-solid fa-user"></i></div>
+      <div class="aluno-name" id="alunoNome">Carregando...</div>
+      <div class="aluno-email" id="alunoEmail">carregando@email.com</div>
+      <div class="turma-badge" id="alunoTurmaBadge"></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" data-target="dashboard" class="active"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+      <a href="#" data-target="boletim"><i class="fa-solid fa-receipt"></i><span>Boletim (Notas)</span></a>
+      <a href="#" data-target="faltas"><i class="fa-solid fa-user-check"></i><span>Minhas Faltas</span></a>
+      <a href="#" data-target="professores"><i class="fa-solid fa-chalkboard-user"></i><span>Meus Professores</span></a>
+      <a href="#" data-target="chat"><i class="fa-solid fa-comments"></i><span>Chat dos Professores</span></a>
+      <a href="#" id="btnLogout"><i class="fa-solid fa-sign-out-alt"></i><span>Sair</span></a>
+    </nav>
+  </div>
+
+  <div class="content-area">
+    <div class="mobile-header">
+      <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+      <h5 id="mobileTitle">Dashboard</h5>
+      <button id="themeToggle" class="menu-btn"><i class="fa-solid fa-moon"></i></button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="screen-dashboard">
+      <div class="stats-grid" id="dashboardStats"></div>
+      <div class="card-modern"><div class="card-title">📊 Desempenho por Disciplina</div><canvas id="desempenhoChart" height="100"></canvas></div>
+    </div>
+
+    <!-- BOLETIM ANGOLANO (Notas por disciplina e trimestres) -->
+    <div id="screen-boletim" style="display:none;">
+      <div class="card-modern">
+        <div class="card-title">📘 Boletim Escolar - Ensino Angolano</div>
+        <div class="card-subtitle">Notas por disciplina (0-20). Média final = (1º+2º+3º)/3. Aprovado ≥10, Recuperação =9, Reprovado <9</div>
+        <div id="boletimContainer" class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr><th>Disciplina</th><th>1º Trim</th><th>2º Trim</th><th>3º Trim</th><th>Média Final</th><th>Situação</th></tr>
+            </thead>
+            <tbody id="boletimBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINHAS FALTAS (por disciplina) -->
+    <div id="screen-faltas" style="display:none;">
+      <div class="card-modern">
+        <div class="card-title">📋 Registro de Faltas</div>
+        <div class="card-subtitle">Faltas registradas por disciplina</div>
+        <div id="faltasContainer" class="table-responsive">
+          <table class="table"><thead><tr><th>Disciplina</th><th>Total de Faltas</th><th>Última falta</th></tr></thead><tbody id="faltasBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEUS PROFESSORES (por disciplina) -->
+    <div id="screen-professores" style="display:none;">
+      <div class="card-modern">
+        <div class="card-title">👩‍🏫 Corpo Docente</div>
+        <div class="card-subtitle">Professores responsáveis por cada disciplina da sua turma</div>
+        <div id="professoresContainer" class="row g-3"></div>
+      </div>
+    </div>
+
+    <!-- CHAT GLOBAL (APENAS VISUALIZAÇÃO - mensagens dos professores) -->
+    <div id="screen-chat" style="display:none;">
+      <div class="card-modern">
+        <div class="card-title">💬 Conversas dos Professores</div>
+        <div class="card-subtitle">Acompanhe as comunicações gerais dos professores (apenas leitura)</div>
+        <div class="chat-messages-area" id="chatMessagesViewer">
+          <div class="text-center text-secondary p-4">Carregando mensagens dos professores...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getDatabase, ref, onValue, get, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBImtt43SlMdLtAiNUY26qpikIhG8ozyrY",
+    authDomain: "escola-a907f.firebaseapp.com",
+    databaseURL: "https://escola-a907f-default-rtdb.firebaseio.com",
+    projectId: "escola-a907f",
+    storageBucket: "escola-a907f.firebasestorage.app",
+    messagingSenderId: "323325281431",
+    appId: "1:323325281431:web:8a6dab5572fe541abd15d2"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+  if (!currentUser || currentUser.tipo !== 'alunos') window.location.href = 'index.html';
+
+  let alunoData = null;
+  let allNotas = {};      // notas do professor (referência)
+  let allFaltas = {};     // faltas
+  let allProfessores = {};
+  let allTurmas = {};
+  let allDisciplinas = {};
+  let allMensagensChat = {}; // mensagens enviadas pelos professores
+
+  // DOM elements
+  const screens = {
+    dashboard: document.getElementById('screen-dashboard'),
+    boletim: document.getElementById('screen-boletim'),
+    faltas: document.getElementById('screen-faltas'),
+    professores: document.getElementById('screen-professores'),
+    chat: document.getElementById('screen-chat')
+  };
+
+  // Tema
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.setAttribute('data-theme', savedTheme);
+  const themeToggle = document.getElementById('themeToggle');
+  if(themeToggle){
+    themeToggle.innerHTML = `<i class="fa-solid ${savedTheme === 'dark' ? 'fa-moon' : 'fa-sun'}"></i>`;
+    themeToggle.onclick = () => {
+      const nt = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', nt);
+      localStorage.setItem('theme', nt);
+      themeToggle.innerHTML = `<i class="fa-solid ${nt === 'dark' ? 'fa-moon' : 'fa-sun'}"></i>`;
+    };
+  }
+
+  // Navegação
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      const target = link.dataset.target;
+      Object.values(screens).forEach(s => { if(s) s.style.display = 'none'; });
+      if(screens[target]) screens[target].style.display = 'block';
+      const mt = document.getElementById('mobileTitle');
+      if(mt && link.querySelector('span')) mt.innerText = link.querySelector('span').innerText;
+      if(window.innerWidth < 992){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; }
+    });
+  });
+  document.getElementById('menuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+  });
+  document.getElementById('overlay')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').style.display = 'none';
+  });
+  document.getElementById('btnLogout')?.addEventListener('click', () => { sessionStorage.clear(); window.location.href = 'index.html'; });
+
+  // Carregar dados do aluno e inicializar
+  async function loadAlunoData() {
+    const snapAluno = await get(ref(db, `alunos/${currentUser.uid}`));
+    if(snapAluno.exists()){
+      alunoData = { id: currentUser.uid, ...snapAluno.val() };
+      document.getElementById('alunoNome').textContent = alunoData.nome || 'Aluno';
+      document.getElementById('alunoEmail').textContent = alunoData.email || '';
+      document.getElementById('alunoTurmaBadge').textContent = `Turma: ${alunoData.turma || 'Não atribuída'}`;
+      // carregar referências
+      startRealtimeListeners();
+    } else {
+      Swal.fire('Erro', 'Dados do aluno não encontrados', 'error').then(()=>{ sessionStorage.clear(); window.location.href='index.html'; });
+    }
+  }
+
+  function startRealtimeListeners(){
+    onValue(ref(db, 'turmas'), snap => { allTurmas = snap.val() || {}; });
+    onValue(ref(db, 'disciplinas'), snap => { allDisciplinas = snap.val() || {}; });
+    onValue(ref(db, 'professores'), snap => { allProfessores = snap.val() || {}; renderProfessores(); });
+    onValue(ref(db, 'notas'), snap => { allNotas = snap.val() || {}; renderBoletim(); renderDashboardChart(); });
+    onValue(ref(db, 'faltas'), snap => { allFaltas = snap.val() || {}; renderFaltas(); renderDashboardStats(); });
+    // Escuta apenas mensagens do chat (global teachers)
+    const chatQuery = query(ref(db, 'mensagensChatAlunos'), orderByChild('timestamp'), limitToLast(100));
+    onValue(chatQuery, snap => { allMensagensChat = snap.val() || {}; renderChatViewer(); });
+  }
+
+  function getDisciplinasDoAluno(){
+    // Disciplinas associadas ao nível/turma: buscamos todas as disciplinas globais + específicas por classe/curso
+    if(!alunoData) return [];
+    const nivel = alunoData.nivel; // 'primario' ou 'medio'
+    const classeAluno = alunoData.classe;
+    const cursoAluno = alunoData.curso;
+    let disciplinasSet = new Set();
+    Object.values(allDisciplinas).forEach(disp => {
+      if(disp.tipoDisciplina === 'global') {
+        disciplinasSet.add(disp.nome);
+      } else if(nivel === 'primario' && disp.tipoDisciplina === 'primario' && disp.classe === classeAluno) {
+        disciplinasSet.add(disp.nome);
+      } else if(nivel === 'medio' && disp.tipoDisciplina === 'medio' && disp.curso === cursoAluno && disp.classe === classeAluno) {
+        disciplinasSet.add(disp.nome);
+      }
+    });
+    return Array.from(disciplinasSet);
+  }
+
+  function renderBoletim(){
+    const tbody = document.getElementById('boletimBody');
+    if(!tbody || !alunoData) return;
+    const disciplinas = getDisciplinasDoAluno();
+    if(disciplinas.length === 0){
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhuma disciplina cadastrada para sua turma</td></tr>';
+      return;
+    }
+    let rows = '';
+    for(let disciplina of disciplinas){
+      // Buscar todas as notas do aluno para esta disciplina
+      let notasTrimestre = {1: null, 2: null, 3: null};
+      Object.entries(allNotas).forEach(([id, nota]) => {
+        if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined){
+          notasTrimestre[nota.trimestre] = nota.valor;
+        }
+      });
+      let soma = 0, count = 0;
+      for(let i=1;i<=3;i++){ if(notasTrimestre[i] !== null){ soma += notasTrimestre[i]; count++; } }
+      let mediaFinal = count > 0 ? soma / count : 0;
+      let situacao = mediaFinal >= 10 ? 'Aprovado' : (mediaFinal === 9 ? 'Recuperação' : 'Reprovado');
+      let badgeClass = mediaFinal >= 10 ? 'badge-success' : (mediaFinal === 9 ? 'badge-warning' : 'badge-danger');
+      rows += `<tr>
+        <td><strong>${escapeHtml(disciplina)}</strong></td>
+        <td>${notasTrimestre[1] !== null ? notasTrimestre[1] : '-'}</td>
+        <td>${notasTrimestre[2] !== null ? notasTrimestre[2] : '-'}</td>
+        <td>${notasTrimestre[3] !== null ? notasTrimestre[3] : '-'}</td>
+        <td class="media-final">${mediaFinal.toFixed(1)}</td>
+        <td><span class="${badgeClass} situacao">${situacao}</span></td>
+      </tr>`;
+    }
+    tbody.innerHTML = rows;
+  }
+
+  function renderFaltas(){
+    const tbody = document.getElementById('faltasBody');
+    if(!tbody || !alunoData) return;
+    const disciplinas = getDisciplinasDoAluno();
+    let faltasPorDisciplina = {};
+    Object.values(allFaltas).forEach(falta => {
+      if(falta.alunoId === currentUser.uid && falta.disciplina){
+        if(!faltasPorDisciplina[falta.disciplina]) faltasPorDisciplina[falta.disciplina] = { total:0, ultimaData: null };
+        faltasPorDisciplina[falta.disciplina].total++;
+        let dataFalta = falta.data || '';
+        if(dataFalta && (!faltasPorDisciplina[falta.disciplina].ultimaData || dataFalta > faltasPorDisciplina[falta.disciplina].ultimaData))
+          faltasPorDisciplina[falta.disciplina].ultimaData = dataFalta;
+      }
+    });
+    if(disciplinas.length === 0 && Object.keys(faltasPorDisciplina).length === 0){
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center">Nenhum registro de falta</td></tr>';
+      return;
+    }
+    let rows = '';
+    for(let disciplina of disciplinas){
+      let dados = faltasPorDisciplina[disciplina] || { total:0, ultimaData: null };
+      rows += `<tr>
+        <td><strong>${escapeHtml(disciplina)}</strong></td>
+        <td>${dados.total} falta(s)</td>
+        <td>${dados.ultimaData ? dados.ultimaData : '---'}</td>
+      </tr>`;
+    }
+    // Incluir disciplinas que tiveram faltas mas não estão na lista (caso algum professor já tenha lançado)
+    for(let disc in faltasPorDisciplina){
+      if(!disciplinas.includes(disc)){
+        let dados = faltasPorDisciplina[disc];
+        rows += `<tr><td><strong>${escapeHtml(disc)}</strong></td><td>${dados.total} falta(s)</td><td>${dados.ultimaData || '---'}</td></tr>`;
+      }
+    }
+    tbody.innerHTML = rows;
+  }
+
+  function renderProfessores(){
+    const container = document.getElementById('professoresContainer');
+    if(!container || !alunoData) return;
+    const disciplinasAluno = getDisciplinasDoAluno();
+    if(disciplinasAluno.length === 0){
+      container.innerHTML = '<div class="col-12 text-center text-secondary">Nenhuma disciplina atribuída.</div>';
+      return;
+    }
+    // Mapear professor por disciplina: procurar professores que tenham turma igual à turma do aluno e que lecionem a disciplina
+    const turmaAluno = alunoData.turma;
+    const professoresMap = new Map(); // disciplina -> professor nome + email
+    Object.values(allProfessores).forEach(prof => {
+      const turmasProf = prof.turmas ? (Array.isArray(prof.turmas) ? prof.turmas : [prof.turmas]) : [];
+      if(turmasProf.includes(turmaAluno) && prof.disciplina){
+        professoresMap.set(prof.disciplina, { nome: prof.nome, email: prof.email, telefone: prof.telefone });
+      }
+    });
+    let html = '';
+    for(let disc of disciplinasAluno){
+      const prof = professoresMap.get(disc);
+      if(prof){
+        html += `<div class="col-md-6 col-lg-4">
+          <div class="card-modern" style="margin-bottom:0;">
+            <div class="d-flex align-items-center gap-3"><i class="fa-solid fa-chalkboard-user fa-2x" style="color:var(--primary);"></i><div><h6 class="mb-0">${escapeHtml(disc)}</h6><p class="mb-0 small text-secondary">${escapeHtml(prof.nome)}</p><small>${escapeHtml(prof.email || '')} ${prof.telefone ? '• '+escapeHtml(prof.telefone) : ''}</small></div></div>
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="col-md-6 col-lg-4"><div class="card-modern" style="margin-bottom:0;"><i class="fa-regular fa-circle-question"></i> ${escapeHtml(disc)}: <span class="text-secondary">Professor não atribuído</span></div></div>`;
+      }
+    }
+    container.innerHTML = html;
+  }
+
+  function renderChatViewer(){
+    const container = document.getElementById('chatMessagesViewer');
+    if(!container) return;
+    let msgs = Object.entries(allMensagensChat).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
+    if(msgs.length === 0){
+      container.innerHTML = '<div class="text-center text-secondary p-4">Nenhuma mensagem dos professores ainda.</div>';
+      return;
+    }
+    container.innerHTML = msgs.map(([id, msg]) => {
+      let time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('pt-BR') : new Date().toLocaleString();
+      let turmaInfo = msg.turma ? `Turma: ${escapeHtml(msg.turma)}` : '';
+      let disciplinaInfo = msg.disciplina ? ` • ${escapeHtml(msg.disciplina)}` : '';
+      return `<div class="chat-message received">
+        <div class="message-bubble">
+          <div><strong>${escapeHtml(msg.professorNome || 'Professor')}</strong> ${turmaInfo}${disciplinaInfo}</div>
+          <div>${escapeHtml(msg.texto)}</div>
+        </div>
+        <div class="message-meta"><i class="fa-regular fa-clock"></i> ${time}</div>
+      </div>`;
+    }).join('');
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function renderDashboardStats(){
+    const disciplinas = getDisciplinasDoAluno();
+    let totalMedia = 0, countDisc = 0;
+    for(let disciplina of disciplinas){
+      let notasTrimestre = {1: null, 2: null, 3: null};
+      Object.entries(allNotas).forEach(([id, nota]) => {
+        if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined)
+          notasTrimestre[nota.trimestre] = nota.valor;
+      });
+      let soma = 0, cnt = 0;
+      for(let i=1;i<=3;i++){ if(notasTrimestre[i] !== null){ soma += notasTrimestre[i]; cnt++; } }
+      if(cnt > 0){ totalMedia += (soma / cnt); countDisc++; }
+    }
+    let mediaGeral = countDisc > 0 ? (totalMedia / countDisc).toFixed(1) : 0;
+    // Total de faltas
+    let totalFaltas = Object.values(allFaltas).filter(f => f.alunoId === currentUser.uid).length;
+    // Total de disciplinas cursadas
+    let totalDisciplinas = disciplinas.length;
+    // Percentual de presença estimado (simples baseado em faltas? apenas ilustrativo)
+    let freqPercent = 100;
+    if(totalFaltas > 0 && totalDisciplinas > 0) freqPercent = Math.max(0, 100 - Math.min(30, totalFaltas * 2));
+    document.getElementById('dashboardStats').innerHTML = `
+      <div class="stat-card"><i class="fa-solid fa-chart-line fa-2x" style="color:var(--primary);"></i><h3>${mediaGeral}</h3><p>Média Geral</p></div>
+      <div class="stat-card"><i class="fa-solid fa-user-check fa-2x" style="color:var(--success);"></i><h3>${freqPercent}%</h3><p>Frequência Estimada</p></div>
+      <div class="stat-card"><i class="fa-solid fa-book fa-2x" style="color:var(--warning);"></i><h3>${totalDisciplinas}</h3><p>Disciplinas</p></div>
+      <div class="stat-card"><i class="fa-solid fa-calendar-day fa-2x" style="color:var(--secondary);"></i><h3>${totalFaltas}</h3><p>Total Faltas</p></div>
+    `;
+  }
+
+  function renderDashboardChart(){
+    const ctx = document.getElementById('desempenhoChart')?.getContext('2d');
+    if(!ctx || !alunoData) return;
+    const disciplinas = getDisciplinasDoAluno();
+    let medias = [];
+    let labels = [];
+    for(let disciplina of disciplinas){
+      let notasTrimestre = {1: null, 2: null, 3: null};
+      Object.entries(allNotas).forEach(([id, nota]) => {
+        if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined)
+          notasTrimestre[nota.trimestre] = nota.valor;
+      });
+      let soma = 0, cnt = 0;
+      for(let i=1;i<=3;i++){ if(notasTrimestre[i] !== null){ soma += notasTrimestre[i]; cnt++; } }
+      let media = cnt > 0 ? soma / cnt : 0;
+      medias.push(media);
+      labels.push(disciplina.length > 15 ? disciplina.slice(0,12)+'..' : disciplina);
+    }
+    if(window.desempenhoChartInstance) window.desempenhoChartInstance.destroy();
+    if(labels.length){
+      window.desempenhoChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Média Final (0-20)', data: medias, backgroundColor: '#6366f1', borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, max: 20, title: { display: true, text: 'Nota' } } } }
+      });
+    } else {
+      ctx.canvas.parentNode.innerHTML = '<div class="text-center p-4">Nenhuma nota lançada para exibir gráfico</div>';
+    }
+  }
+
+  function escapeHtml(str){
+    if(!str) return '';
+    return String(str).replace(/[&<>]/g, function(m){
+      if(m === '&') return '&amp;';
+      if(m === '<') return '&lt;';
+      if(m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Atualizar dashboard ao mudar dados
+  function refreshAll(){
+    renderDashboardStats();
+    renderDashboardChart();
+    renderBoletim();
+    renderFaltas();
+    renderProfessores();
+  }
+
+  // Observadores adicionais para manter atualização
+  const observerNotas = () => { renderBoletim(); renderDashboardChart(); renderDashboardStats(); };
+  const observerFaltas = () => { renderFaltas(); renderDashboardStats(); };
+  const observerProfessores = () => { renderProfessores(); };
+  const observerDisciplinas = () => { renderBoletim(); renderFaltas(); renderProfessores(); renderDashboardStats(); renderDashboardChart(); };
+
+  // Override listeners para manter consistência
+  const originalNotas = onValue(ref(db, 'notas'), snap => { allNotas = snap.val() || {}; observerNotas(); });
+  const originalFaltas = onValue(ref(db, 'faltas'), snap => { allFaltas = snap.val() || {}; observerFaltas(); });
+  const originalProfessores = onValue(ref(db, 'professores'), snap => { allProfessores = snap.val() || {}; observerProfessores(); });
+  const originalDisciplinas = onValue(ref(db, 'disciplinas'), snap => { allDisciplinas = snap.val() || {}; observerDisciplinas(); });
+  const originalTurmas = onValue(ref(db, 'turmas'), snap => { allTurmas = snap.val() || {}; observerDisciplinas(); });
+
+  loadAlunoData();
+</script>
+</body>
+</html>

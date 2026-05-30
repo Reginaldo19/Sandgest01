@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>SandGest · Portal Educacional</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      background: url('sandnney.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* Overlay dinâmico para melhor contraste com o fundo */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    [data-theme="light"] body::before {
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(2px);
+    }
+
+    /* Container principal */
+    .login-container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Desktop: acima de 992px muda para layout lado a lado */
+    @media (min-width: 992px) {
+      .login-container {
+        max-width: 1200px;
+      }
+      
+      .split-desktop {
+        display: flex;
+        gap: 30px;
+        align-items: stretch;
+      }
+      
+      .desktop-brand {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 2rem;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      [data-theme="light"] .desktop-brand {
+        background: rgba(255, 255, 255, 0.7);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+      aqui qaa
+      .desktop-brand-content {
+        text-align: center;
+        max-width: 380px;
+      }
+      
+      .desktop-brand .logo-circle {
+        width: 160px;
+        height: 160px;
+        margin: 0 auto 1.5rem auto;
+        background: linear-gradient(145deg, #ffffff30, #ffffff10);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      
+      .desktop-brand .logo-circle img {
+        width: 145px;
+        height: 145px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      
+      .desktop-brand h2 {
+        font-weight: 800;
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #FFFFFF, #D1D5FF);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+      }
+      
+      [data-theme="light"] .desktop-brand h2 {
+        background: linear-gradient(135deg, #1E2A5E, #3A4D8F);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      
+      .desktop-brand p {
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 500;
+      }
+      
+      [data-theme="light"] .desktop-brand p {
+        color: #1e293b;
+      }
+      
+      .desktop-features {
+        margin-top: 2rem;
+        text-align: left;
+        display: inline-block;
+      }
+      
+      .desktop-features li {
+        list-style: none;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #f1f5f9;
+        font-size: 0.9rem;
+      }
+      
+      [data-theme="light"] .desktop-features li {
+        color: #0f172a;
+      }
+      
+      .desktop-features li i {
+        width: 28px;
+        color: #a5b4fc;
+      }
+      
+      .desktop-form {
+        flex: 1;
+      }
+      
+      /* Ajuste no glass-card para desktop */
+      .desktop-form .glass-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Esconder logo-wrapper no desktop */
+      .desktop-brand ~ .glass-card .logo-wrapper {
+        display: none;
+      }
+    }
+
+    /* Mobile: esconder o conteúdo da marca desktop */
+    @media (max-width: 991px) {
+      .desktop-brand {
+        display: none;
+      }
+    }
+
+    .glass-card {
+      background: rgba(18, 22, 28, 0.82);
+      backdrop-filter: blur(14px);
+      border-radius: 2rem;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    [data-theme="light"] .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    /* Header com logo moderna (mobile e fallback) */
+    .logo-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+    .logo-circle {
+      width: 85px;
+      height: 85px;
+      background: linear-gradient(145deg, #ffffff20, #ffffff08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .logo-circle img {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .login-header h3 {
+      font-weight: 700;
+      font-size: 1.9rem;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #FFFFFF, #D1D5FF);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.25rem;
+    }
+    [data-theme="light"] .login-header h3 {
+      background: linear-gradient(135deg, #1E2A5E, #3A4D8F);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .login-header p {
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+    }
+    [data-theme="light"] .login-header p {
+      color: #1e293b;
+    }
+
+    /* método toggle estilizado */
+    .login-method-toggle {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 60px;
+      padding: 4px;
+      display: flex;
+      gap: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 1.8rem;
+    }
+    [data-theme="light"] .login-method-toggle {
+      background: #eef2ff;
+      border-color: #cbd5e1;
+    }
+    .method-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px 0;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    [data-theme="light"] .method-btn {
+      color: #1e293b;
+    }
+    .method-btn.active {
+      background: #4361ee;
+      color: white;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+    }
+    .method-btn i {
+      margin-right: 8px;
+    }
+
+    /* inputs com design clean */
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #f1f5f9;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+    }
+    [data-theme="light"] .form-label {
+      color: #0f172a;
+    }
+    .input-group-text {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-right: none;
+      color: #cbd5e6;
+    }
+    [data-theme="light"] .input-group-text {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    .form-control, .form-select {
+      background: rgba(10, 14, 23, 0.75);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 1rem;
+      padding: 12px 16px;
+      color: #f8fafc;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+    [data-theme="light"] .form-control, [data-theme="light"] .form-select {
+      background: white;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    .form-control:focus {
+      border-color: #818cf8;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+      background: rgba(20, 25, 40, 0.9);
+    }
+
+    /* badge de detecção */
+    .user-type-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 12px;
+      text-transform: uppercase;
+    }
+    .admin-badge { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
+    .teacher-badge { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+    .student-badge { background: linear-gradient(135deg, #10b981, #047857); color: white; }
+    .user-type-info {
+      background: rgba(0,0,0,0.35);
+      border-radius: 1rem;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      border-left: 4px solid #4361ee;
+      margin-top: 1rem;
+    }
+    [data-theme="light"] .user-type-info {
+      background: #f1f5f9;
+    }
+
+    /* botão principal */
+    .btn-primary-custom {
+      background: linear-gradient(95deg, #4361ee, #3a0ca3);
+      border: none;
+      border-radius: 60px;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+      transition: all 0.2s;
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+    }
+    .btn-primary-custom:hover {
+      transform: scale(1.02);
+      background: linear-gradient(95deg, #5a77ff, #4a1db0);
+      box-shadow: 0 12px 28px rgba(67, 97, 238, 0.5);
+    }
+
+    /* tema toggle refinado */
+    .theme-toggle-glass {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      z-index: 999;
+      color: white;
+      font-size: 1.3rem;
+      transition: 0.2s;
+    }
+    [data-theme="light"] .theme-toggle-glass {
+      background: rgba(255,255,255,0.7);
+      color: #1e293b;
+      border-color: #94a3b8;
+    }
+    .theme-toggle-glass:hover {
+      transform: rotate(20deg);
+    }
+
+    /* responsivo mobile mantém o estilo original */
+    @media (max-width: 480px) {
+      .glass-card {
+        padding: 1.5rem;
+      }
+      .login-header h3 {
+        font-size: 1.6rem;
+      }
+    }
+    .loading-spinner i {
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .demo-hint {
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 1.2rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="theme-toggle-glass" id="themeToggleGlass">
+    <i class="fas fa-sun" id="themeIcon"></i>
+  </div>
+
+  <div class="login-container">
+    <!-- Desktop: estrutura com 2 colunas -->
+    <div class="split-desktop">
+      <!-- Lado esquerdo - Branding (aparece só em desktop) -->
+      <div class="desktop-brand">
+        <div class="desktop-brand-content">
+          <div class="logo-circle">
+            <img src="logo.jpg" alt="Logo SandGest" onerror="this.src='https://via.placeholder.com/145?text=SG'">
+          </div>
+          <h2>SandGest</h2>
+          <p>Portal Educacional Integrado</p>
+          <ul class="desktop-features">
+            <li><i class="fas fa-chalkboard-user"></i> Gestão acadêmica completa</li>
+            <li><i class="fas fa-chart-line"></i> Desempenho em tempo real</li>
+            <li><i class="fas fa-shield-alt"></i> Acesso seguro e personalizado</li>
+            <li><i class="fas fa-bugs"></i> Evitando erros humanos e facilitando tarefas</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Lado direito - Formulário (igual ao original) -->
+      <div class="desktop-form">
+        <div class="glass-card">
+          <div class="logo-wrapper">
+            <div class="logo-circle">
+              <img src="logo.jpg" alt="Logo SandGest" onerror="this.src='https://via.placeholder.com/80?text=SG'">
+            </div>
+          </div>
+          <div class="login-header text-center">
+            <h3>SandGest</h3>
+            <p>Portal Educacional Integrado</p>
+          </div>
+
+          <form id="loginForm">
+            <div class="login-method-toggle">
+              <button type="button" id="btnEmailMethod" class="method-btn active">
+                <i class="fas fa-envelope"></i> Email
+              </button>
+              <button type="button" id="btnMatriculaMethod" class="method-btn">
+                <i class="fas fa-id-card"></i> Matrícula
+              </button>
+            </div>
+
+            <div class="mb-4" id="emailField">
+              <label class="form-label"><i class="fas fa-at me-1"></i>E-mail institucional</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                <input type="email" id="email" class="form-control" placeholder="example@gmail.com" autocomplete="email">
+              </div>
+            </div>
+
+            <div class="mb-4" id="matriculaField" style="display: none;">
+              <label class="form-label"><i class="fas fa-qrcode me-1"></i>Matrícula / ID</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                <input type="text" id="matricula" class="form-control" placeholder="EX: ALUNO20260001" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label"><i class="fas fa-lock me-1"></i>Senha</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+              </div>
+            </div>
+            
+            <div class="loading-spinner text-center" id="loadingSpinner" style="display: none;">
+              <i class="fas fa-circle-notch fa-2x" style="color: #818cf8;"></i>
+              <p class="mt-2 mb-0 small">autenticando...</p>
+            </div>
+
+            <div class="mb-3" id="userTypeSection">
+              <label class="form-label">Tipo de usuário <i class="fas fa-users"></i></label>
+              <div id="userTypeIndicator" class="form-control" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);">
+                <span id="detectedUserType">Digite seu e-mail ou matrícula</span>
+                <span id="userTypeBadge" class="user-type-badge"></span>
+              </div>
+              <small class="text-muted mt-1 d-block">detectado automaticamente</small>
+            </div>
+            
+            <div id="userTypeInfo" class="user-type-info" style="display: none;">
+              <div id="adminInfo" style="display: none;"><i class="fas fa-shield-alt me-2"></i> <strong>Administrador:</strong> gestão total (alunos, professores, turmas, financeiro)</div>
+              <div id="teacherInfo" style="display: none;"><i class="fas fa-chalkboard-user me-2"></i> <strong>Professor:</strong> notas, frequência, turmas</div>
+              <div id="studentInfo" style="display: none;"><i class="fas fa-graduation-cap me-2"></i> <strong>Aluno:</strong> boletim, horários, conteúdo</div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary-custom w-100 mt-2" id="loginButton">
+              <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Entrar
+            </button>
+          </form>
+
+          <div class="demo-hint text-muted">
+            <i class="fas fa-shield-heart"></i> Acesso seguro · SandGest 2026
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBImtt43SlMdLtAiNUY26qpikIhG8ozyrY",
+      authDomain: "escola-a907f.firebaseapp.com",
+      databaseURL: "https://escola-a907f-default-rtdb.firebaseio.com",
+      projectId: "escola-a907f",
+      storageBucket: "escola-a907f.firebasestorage.app",
+      messagingSenderId: "323325281431",
+      appId: "1:323325281431:web:8a6dab5572fe541abd15d2"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let loginMethod = 'email'; // email ou matricula
+
+    const userTypeMap = {
+      'Admin': { name: 'Administrador', badgeClass: 'admin-badge', badgeText: 'ADMIN', path: 'adm.html' },
+      'professores': { name: 'Professor', badgeClass: 'teacher-badge', badgeText: 'PROF', path: 'prof.html' },
+      'alunos': { name: 'Aluno', badgeClass: 'student-badge', badgeText: 'ALUNO', path: 'aluno.html' }
+    };
+
+    async function findUserByEmail(email) {
+      if (!email) return null;
+      const collections = ['Admin', 'professores', 'alunos'];
+      for (const collection of collections) {
+        try {
+          const snapshot = await get(ref(db, collection));
+          if (snapshot.exists()) {
+            const items = snapshot.val();
+            for (const [id, data] of Object.entries(items)) {
+              if (data.email && data.email.toLowerCase() === email.toLowerCase()) {
+                return { id, type: collection, data };
+              }
+            }
+          }
+        } catch (e) { console.warn(e); }
+      }
+      return null;
+    }
+
+    async function findUserByMatricula(matricula) {
+      if (!matricula) return null;
+      // Admin (id ou idCoordenador/idProfessor)
+      try {
+        const adminSnap = await get(ref(db, 'Admin'));
+        if (adminSnap.exists()) {
+          const admins = adminSnap.val();
+          for (const [id, data] of Object.entries(admins)) {
+            if (data.id === matricula || data.idProfessor === matricula || data.idCoordenador === matricula) {
+              return { id, type: 'Admin', data };
+            }
+          }
+        }
+      } catch(e) {}
+      try {
+        const profSnap = await get(ref(db, 'professores'));
+        if (profSnap.exists()) {
+          const professores = profSnap.val();
+          for (const [id, data] of Object.entries(professores)) {
+            if (data.idProfessor === matricula || data.matricula === matricula) {
+              return { id, type: 'professores', data };
+            }
+          }
+        }
+      } catch(e) {}
+      try {
+        const alunoSnap = await get(ref(db, 'alunos'));
+        if (alunoSnap.exists()) {
+          const alunos = alunoSnap.val();
+          for (const [id, data] of Object.entries(alunos)) {
+            if (data.matricula === matricula) {
+              return { id, type: 'alunos', data };
+            }
+          }
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    async function updateUserTypeIndicator(emailValue, matriculaValue) {
+      const indicatorSpan = document.getElementById('detectedUserType');
+      const badgeSpan = document.getElementById('userTypeBadge');
+      const infoDiv = document.getElementById('userTypeInfo');
+      const adminDiv = document.getElementById('adminInfo');
+      const teacherDiv = document.getElementById('teacherInfo');
+      const studentDiv = document.getElementById('studentInfo');
+      
+      adminDiv.style.display = 'none';
+      teacherDiv.style.display = 'none';
+      studentDiv.style.display = 'none';
+      infoDiv.style.display = 'none';
+      
+      if (loginMethod === 'email' && emailValue) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+          indicatorSpan.textContent = "E-mail inválido";
+          badgeSpan.textContent = '';
+          badgeSpan.className = 'user-type-badge';
+          return;
+        }
+        indicatorSpan.textContent = "verificando...";
+        const result = await findUserByEmail(emailValue);
+        if (result) {
+          const tInfo = userTypeMap[result.type];
+          if (tInfo) {
+            indicatorSpan.textContent = tInfo.name;
+            badgeSpan.textContent = tInfo.badgeText;
+            badgeSpan.className = `user-type-badge ${tInfo.badgeClass}`;
+            infoDiv.style.display = 'block';
+            if (result.type === 'Admin') adminDiv.style.display = 'block';
+            else if (result.type === 'professores') teacherDiv.style.display = 'block';
+            else if (result.type === 'alunos') studentDiv.style.display = 'block';
+          }
+        } else {
+          indicatorSpan.textContent = "E-mail não cadastrado";
+          badgeSpan.textContent = '';
+          badgeSpan.className = 'user-type-badge';
+        }
+      } 
+      else if (loginMethod === 'matricula' && matriculaValue) {
+        if (!matriculaValue.trim()) {
+          indicatorSpan.textContent = "Digite a matrícula/ID";
+          badgeSpan.textContent = '';
+          return;
+        }
+        indicatorSpan.textContent = "verificando matrícula...";
+        const result = await findUserByMatricula(matriculaValue);
+        if (result) {
+          const tInfo = userTypeMap[result.type];
+          if (tInfo) {
+            indicatorSpan.textContent = tInfo.name;
+            badgeSpan.textContent = tInfo.badgeText;
+            badgeSpan.className = `user-type-badge ${tInfo.badgeClass}`;
+            infoDiv.style.display = 'block';
+            if (result.type === 'Admin') adminDiv.style.display = 'block';
+            else if (result.type === 'professores') teacherDiv.style.display = 'block';
+            else if (result.type === 'alunos') studentDiv.style.display = 'block';
+          }
+        } else {
+          indicatorSpan.textContent = "Matrícula não encontrada";
+          badgeSpan.textContent = '';
+          badgeSpan.className = 'user-type-badge';
+        }
+      } else {
+        indicatorSpan.textContent = "Digite seu e-mail ou matrícula para detecção";
+        badgeSpan.textContent = '';
+        badgeSpan.className = 'user-type-badge';
+      }
+    }
+
+    // toggles de método
+    document.getElementById('btnEmailMethod').addEventListener('click', () => {
+      loginMethod = 'email';
+      document.getElementById('btnEmailMethod').classList.add('active');
+      document.getElementById('btnMatriculaMethod').classList.remove('active');
+      document.getElementById('emailField').style.display = 'block';
+      document.getElementById('matriculaField').style.display = 'none';
+      document.getElementById('email').required = true;
+      document.getElementById('matricula').required = false;
+      document.getElementById('email').value = '';
+      document.getElementById('matricula').value = '';
+      updateUserTypeIndicator('', '');
+    });
+
+    document.getElementById('btnMatriculaMethod').addEventListener('click', () => {
+      loginMethod = 'matricula';
+      document.getElementById('btnMatriculaMethod').classList.add('active');
+      document.getElementById('btnEmailMethod').classList.remove('active');
+      document.getElementById('emailField').style.display = 'none';
+      document.getElementById('matriculaField').style.display = 'block';
+      document.getElementById('email').required = false;
+      document.getElementById('matricula').required = true;
+      document.getElementById('email').value = '';
+      document.getElementById('matricula').value = '';
+      updateUserTypeIndicator('', '');
+    });
+
+    let debounceTimer;
+    const emailInput = document.getElementById('email');
+    const matriculaInput = document.getElementById('matricula');
+
+    emailInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (loginMethod === 'email') updateUserTypeIndicator(e.target.value, '');
+      }, 500);
+    });
+    matriculaInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (loginMethod === 'matricula') updateUserTypeIndicator('', e.target.value);
+      }, 500);
+    });
+
+    // LOGIN SUBMIT
+    const loginForm = document.getElementById('loginForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const loginBtn = document.getElementById('loginButton');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailVal = emailInput.value.trim();
+      const matriculaVal = matriculaInput.value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (!password) {
+        Swal.fire("Atenção", "Digite sua senha para continuar.", "warning");
+        return;
+      }
+      if (loginMethod === 'email' && !emailVal) {
+        Swal.fire("Atenção", "Informe o e-mail.", "warning");
+        return;
+      }
+      if (loginMethod === 'matricula' && !matriculaVal) {
+        Swal.fire("Atenção", "Informe a matrícula/ID.", "warning");
+        return;
+      }
+      
+      loadingSpinner.style.display = 'block';
+      loginBtn.disabled = true;
+      
+      try {
+        let userResult = null;
+        if (loginMethod === 'email') {
+          userResult = await findUserByEmail(emailVal);
+        } else {
+          userResult = await findUserByMatricula(matriculaVal);
+        }
+        
+        if (!userResult) {
+          Swal.fire("Erro", loginMethod === 'email' ? "E-mail não localizado." : "Matrícula não encontrada.", "error");
+          loadingSpinner.style.display = 'none';
+          loginBtn.disabled = false;
+          return;
+        }
+        
+        const storedPwd = userResult.data.password || 'escola123';
+        if (storedPwd !== password) {
+          Swal.fire("Erro", "Senha incorreta.", "error");
+          loadingSpinner.style.display = 'none';
+          loginBtn.disabled = false;
+          return;
+        }
+        
+        const userInfo = {
+          uid: userResult.id,
+          tipo: userResult.type,
+          userData: userResult.data,
+          nome: userResult.data.nome || 'Usuário',
+          email: userResult.data.email || ''
+        };
+        if (userResult.type === 'alunos') userInfo.matricula = userResult.data.matricula;
+        if (userResult.type === 'professores') userInfo.idProfessor = userResult.data.idProfessor;
+        
+        sessionStorage.setItem('currentUser', JSON.stringify(userInfo));
+        const redirectPath = userTypeMap[userResult.type]?.path || 'index.html';
+        await Swal.fire({
+          icon: 'success',
+          title: `Bem-vindo(a), ${userResult.data.nome || 'Usuário'}!`,
+          text: `Redirecionando para área ${userTypeMap[userResult.type]?.name || 'sistema'}`,
+          timer: 1800,
+          showConfirmButton: false,
+        });
+        window.location.href = redirectPath;
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Erro inesperado", "Não foi possível concluir o login. Tente mais tarde.", "error");
+      } finally {
+        loadingSpinner.style.display = 'none';
+        loginBtn.disabled = false;
+      }
+    });
+
+    // TEMA (CLARO/ESCURO) com persistência
+    const themeBtn = document.getElementById('themeToggleGlass');
+    const themeIconEl = document.getElementById('themeIcon');
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      if (theme === 'light') {
+        themeIconEl.className = 'fas fa-moon';
+      } else {
+        themeIconEl.className = 'fas fa-sun';
+      }
+      localStorage.setItem('sandgest_theme', theme);
+    }
+    const savedTheme = localStorage.getItem('sandgest_theme') || 'dark';
+    setTheme(savedTheme);
+    themeBtn.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme');
+      const newTheme = current === 'light' ? 'dark' : 'light';
+      setTheme(newTheme);
+    });
+
+    // Inicializar placeholder visual da detecção
+    updateUserTypeIndicator('', '');
+  </script>
+</body>
+</html>
