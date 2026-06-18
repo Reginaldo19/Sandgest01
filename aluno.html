@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=yes" />
-  <title>Aluno • Boletim Escolar Angola</title>
-  <!-- Bootstrap + Font Awesome + Google Fonts + Chart.js + SweetAlert -->
+  <title>Aluno • SandGest</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,36 +20,44 @@
       --danger: #ef4444;
       --info: #3b82f6;
       --radius: 1rem;
+      --radius-lg: 1.25rem;
     }
     [data-theme="light"] {
       --bg-primary: #f1f5f9;
       --card-bg: #ffffff;
       --text-primary: #0f172a;
       --text-secondary: #475569;
+      --text-muted: #94a3b8;
       --border-color: #e2e8f0;
       --sidebar-bg: #ffffff;
       --input-bg: #ffffff;
       --hover-bg: #f1f5f9;
       --chat-bg: #f8fafc;
+      --shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
     [data-theme="dark"] {
       --bg-primary: #0f172a;
       --card-bg: #1e293b;
       --text-primary: #f1f5f9;
       --text-secondary: #94a3b8;
+      --text-muted: #64748b;
       --border-color: #334155;
       --sidebar-bg: #0f172a;
       --input-bg: #1e293b;
       --hover-bg: #334155;
       --chat-bg: #1a2332;
+      --shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+      line-height: 1.6;
     }
     .app { display: flex; min-height: 100vh; }
+    
+    /* Sidebar */
     .sidebar {
       width: 280px;
       background: var(--sidebar-bg);
@@ -60,33 +67,41 @@
       top: 0;
       bottom: 0;
       transform: translateX(-100%);
-      transition: transform 0.3s;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
       z-index: 1050;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
     }
     .sidebar.open { transform: translateX(0); }
+    @media (min-width: 992px) {
+      .sidebar { transform: translateX(0); position: relative; }
+      .mobile-header { display: none; }
+    }
+    
     .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
     .sidebar-brand {
       display: flex;
       align-items: center;
       gap: 0.75rem;
       font-weight: 800;
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
+    
     .aluno-profile {
       padding: 1.25rem;
       margin: 1rem;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       text-align: center;
+      transition: all 0.3s ease;
     }
+    .aluno-profile:hover { border-color: var(--primary); transform: translateY(-2px); }
     .aluno-avatar {
       width: 80px;
       height: 80px;
@@ -108,7 +123,9 @@
       border-radius: 2rem;
       font-size: 0.7rem;
       margin-top: 0.5rem;
+      font-weight: 600;
     }
+    
     .sidebar-nav {
       flex: 1;
       padding: 1rem 0.75rem;
@@ -126,22 +143,23 @@
       text-decoration: none;
       font-weight: 500;
       font-size: 0.875rem;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      cursor: pointer;
     }
     .sidebar-nav a:hover, .sidebar-nav a.active {
       background: var(--hover-bg);
       color: var(--primary);
     }
+    .sidebar-nav a i { width: 1.25rem; text-align: center; }
+    
     .content-area {
       flex: 1;
       margin-left: 0;
       padding: 1.5rem;
       width: 100%;
+      max-width: 1400px;
     }
-    @media (min-width: 992px) {
-      .sidebar { transform: translateX(0); position: relative; }
-      .mobile-header { display: none; }
-    }
+    
     .mobile-header {
       display: flex;
       justify-content: space-between;
@@ -157,16 +175,39 @@
       color: var(--text-primary);
       cursor: pointer;
       padding: 0.5rem;
+      transition: all 0.2s;
     }
+    .mobile-header .menu-btn:hover { color: var(--primary); }
+    
+    /* Cards */
     .card-modern {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
       margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
     }
-    .card-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.25rem; }
-    .card-subtitle { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .card-modern:hover { border-color: var(--primary); }
+    .card-title { 
+      font-weight: 700; 
+      font-size: 1.25rem; 
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-title i { color: var(--primary); }
+    .card-subtitle { 
+      font-size: 0.85rem; 
+      color: var(--text-secondary); 
+      margin-bottom: 1.25rem;
+      border-left: 3px solid var(--primary);
+      padding-left: 0.75rem;
+    }
+    
+    /* Stats */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -177,52 +218,102 @@
     .stat-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       padding: 1.25rem;
       text-align: center;
+      transition: all 0.3s ease;
     }
+    .stat-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+    .stat-card i { font-size: 2rem; color: var(--primary); }
     .stat-card h3 { font-size: 1.8rem; font-weight: 700; margin: 0.5rem 0; }
-    .badge-success { background: var(--success); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
-    .badge-warning { background: var(--warning); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
-    .badge-danger { background: var(--danger); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
-    .badge-info { background: var(--info); color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
-    .table-responsive { overflow-x: auto; }
-    .table { width: 100%; border-collapse: collapse; }
-    .table th, .table td { padding: 0.85rem; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
-    .table th { font-weight: 600; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .professor-chip {
-      background: var(--hover-bg);
-      border-radius: 2rem;
-      padding: 0.25rem 0.75rem;
-      display: inline-block;
-      margin: 0.2rem 0.3rem;
-      font-size: 0.75rem;
+    .stat-card p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
+    
+    /* Badges */
+    .badge-aprovado { background: var(--success); color: white; padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .badge-recuperacao { background: var(--warning); color: white; padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .badge-reprovado { background: var(--danger); color: white; padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; }
+    .badge-turma { background: var(--info); color: white; padding: 0.2rem 0.6rem; border-radius: 2rem; font-size: 0.65rem; font-weight: 600; }
+    
+    /* Tabela */
+    .table-responsive { overflow-x: auto; border-radius: var(--radius); }
+    .table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 0.9rem;
     }
+    .table th, .table td { 
+      padding: 0.85rem 1rem; 
+      border-bottom: 1px solid var(--border-color); 
+      text-align: left; 
+      vertical-align: middle; 
+    }
+    .table th { 
+      font-weight: 600; 
+      color: var(--text-secondary); 
+      font-size: 0.7rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px;
+      background: var(--bg-primary);
+    }
+    .table tr:hover { background: var(--hover-bg); }
+    .table .nota-cell { font-weight: 700; font-size: 1.05rem; }
+    .table .media-cell { font-weight: 800; font-size: 1.1rem; color: var(--primary); }
+    
+    /* Professores, Alunos, Disciplinas */
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    .item-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+    .item-card .item-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .item-card .item-nome { font-weight: 600; font-size: 1rem; }
+    .item-card .item-sub { font-size: 0.85rem; color: var(--primary); font-weight: 500; }
+    .item-card .item-detalhes { font-size: 0.75rem; color: var(--text-secondary); }
+    
+    /* Chat */
     .chat-messages-area {
       height: 60vh;
       overflow-y: auto;
       background: var(--chat-bg);
       border-radius: var(--radius);
-      padding: 1rem;
+      padding: 1.5rem;
     }
-    .chat-message {
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-    }
+    .chat-message { margin-bottom: 1rem; display: flex; flex-direction: column; }
     .chat-message.received { align-items: flex-start; }
     .message-bubble {
       max-width: 80%;
-      padding: 0.75rem 1rem;
+      padding: 0.75rem 1.25rem;
       border-radius: 1.25rem;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
     }
+    .message-bubble .msg-professor { font-weight: 600; color: var(--primary); font-size: 0.85rem; }
+    .message-bubble .msg-texto { margin: 0.25rem 0; }
     .message-meta {
       font-size: 0.65rem;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       margin-top: 0.25rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
     }
+    
     .overlay {
       position: fixed;
       inset: 0;
@@ -231,33 +322,49 @@
       z-index: 1040;
       display: none;
     }
+    
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--border-color); }
     ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-    .boletim-ano { font-weight: 700; margin-top: 1rem; }
-    .media-final { font-weight: 800; }
-    .situacao { font-weight: 600; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+    .empty-state i { font-size: 3rem; opacity: 0.5; margin-bottom: 0.5rem; }
+    
+    @media (max-width: 576px) {
+      .content-area { padding: 0.75rem; }
+      .card-modern { padding: 0.75rem; }
+      .table th, .table td { padding: 0.5rem; font-size: 0.75rem; }
+    }
   </style>
 </head>
 <body data-theme="dark">
 <div class="app">
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-header"><div class="sidebar-brand">
-      <img src="logo.jpg" width="80" style="border-radius: 100%;">
-      <span>EduTrack</span></div></div>
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <img src="logo.jpg" width="40" style="border-radius: 100%;">
+        <span>SandGest</span>
+      </div>
+    </div>
     <div class="aluno-profile">
-      <div class="aluno-avatar"><i class="fa-solid fa-user"></i></div>
+      <div class="aluno-avatar"><i class="fa-solid fa-user-graduate"></i></div>
       <div class="aluno-name" id="alunoNome">Carregando...</div>
       <div class="aluno-email" id="alunoEmail">carregando@email.com</div>
-      <div class="turma-badge" id="alunoTurmaBadge"></div>
+      <div class="turma-badge" id="alunoTurmaBadge"><i class="fa-solid fa-chalkboard"></i> Carregando...</div>
     </div>
     <nav class="sidebar-nav">
-      <a href="#" data-target="dashboard" class="active"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
-      <a href="#" data-target="boletim"><i class="fa-solid fa-receipt"></i><span>Boletim (Notas)</span></a>
-      <a href="#" data-target="faltas"><i class="fa-solid fa-user-check"></i><span>Minhas Faltas</span></a>
-      <a href="#" data-target="professores"><i class="fa-solid fa-chalkboard-user"></i><span>Meus Professores</span></a>
-      <a href="#" data-target="chat"><i class="fa-solid fa-comments"></i><span>Chat dos Professores</span></a>
-      <a href="#" id="btnLogout"><i class="fa-solid fa-sign-out-alt"></i><span>Sair</span></a>
+      <a href="#" data-target="dashboard" class="active"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
+      <a href="#" data-target="boletim"><i class="fa-solid fa-receipt"></i><span>Boletim</span></a>
+      <a href="#" data-target="faltas"><i class="fa-solid fa-user-check"></i><span>Faltas</span></a>
+      <a href="#" data-target="turma"><i class="fa-solid fa-people-group"></i><span>Minha Turma</span></a>
+      <a href="#" data-target="disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a>
+      <a href="#" data-target="professores"><i class="fa-solid fa-chalkboard-user"></i><span>Professores</span></a>
+      <a href="#" data-target="chat"><i class="fa-solid fa-comments"></i><span>Chat</span></a>
+      <a href="#" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i><span>Sair</span></a>
     </nav>
   </div>
 
@@ -271,18 +378,29 @@
     <!-- DASHBOARD -->
     <div id="screen-dashboard">
       <div class="stats-grid" id="dashboardStats"></div>
-      <div class="card-modern"><div class="card-title">📊 Desempenho por Disciplina</div><canvas id="desempenhoChart" height="100"></canvas></div>
+      <div class="card-modern">
+        <div class="card-title"><i class="fa-solid fa-chart-simple"></i> Desempenho por Disciplina</div>
+        <div class="card-subtitle">Média final de cada disciplina (0-20)</div>
+        <canvas id="desempenhoChart" height="120"></canvas>
+      </div>
     </div>
 
-    <!-- BOLETIM ANGOLANO (Notas por disciplina e trimestres) -->
+    <!-- BOLETIM -->
     <div id="screen-boletim" style="display:none;">
       <div class="card-modern">
-        <div class="card-title">📘 Boletim Escolar - Ensino Angolano</div>
-        <div class="card-subtitle">Notas por disciplina (0-20). Média final = (1º+2º+3º)/3. Aprovado ≥10, Recuperação =9, Reprovado <9</div>
+        <div class="card-title"><i class="fa-solid fa-file-pen"></i> Boletim Escolar</div>
+        <div class="card-subtitle">Notas por disciplina (0-20) • Média = (1ºT + 2ºT + 3ºT) / 3 • Aprovado ≥ 10 • Recuperação = 9 • Reprovado &lt; 9</div>
         <div id="boletimContainer" class="table-responsive">
           <table class="table">
             <thead>
-              <tr><th>Disciplina</th><th>1º Trim</th><th>2º Trim</th><th>3º Trim</th><th>Média Final</th><th>Situação</th></tr>
+              <tr>
+                <th>Disciplina</th>
+                <th style="text-align:center;">1º Trim</th>
+                <th style="text-align:center;">2º Trim</th>
+                <th style="text-align:center;">3º Trim</th>
+                <th style="text-align:center;">Média</th>
+                <th style="text-align:center;">Situação</th>
+              </tr>
             </thead>
             <tbody id="boletimBody"></tbody>
           </table>
@@ -290,33 +408,60 @@
       </div>
     </div>
 
-    <!-- MINHAS FALTAS (por disciplina) -->
+    <!-- FALTAS -->
     <div id="screen-faltas" style="display:none;">
       <div class="card-modern">
-        <div class="card-title">📋 Registro de Faltas</div>
+        <div class="card-title"><i class="fa-solid fa-calendar-xmark"></i> Registro de Faltas</div>
         <div class="card-subtitle">Faltas registradas por disciplina</div>
         <div id="faltasContainer" class="table-responsive">
-          <table class="table"><thead><tr><th>Disciplina</th><th>Total de Faltas</th><th>Última falta</th></tr></thead><tbody id="faltasBody"></tbody></table>
+          <table class="table">
+            <thead><tr><th>Disciplina</th><th style="text-align:center;">Total</th><th>Última falta</th></tr></thead>
+            <tbody id="faltasBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- MEUS PROFESSORES (por disciplina) -->
+    <!-- MINHA TURMA -->
+    <div id="screen-turma" style="display:none;">
+      <div class="card-modern">
+        <div class="card-title"><i class="fa-solid fa-people-group"></i> Minha Turma</div>
+        <div class="card-subtitle">Todos os alunos da sua turma</div>
+        <div id="turmaContainer" class="table-responsive">
+          <table class="table">
+            <thead><tr><th>#</th><th>Nome</th><th>Matrícula</th><th>Status</th></tr></thead>
+            <tbody id="turmaBody"></tbody>
+          </table>
+        </div>
+        <div class="mt-3" id="turmaInfo"></div>
+      </div>
+    </div>
+
+    <!-- DISCIPLINAS -->
+    <div id="screen-disciplinas" style="display:none;">
+      <div class="card-modern">
+        <div class="card-title"><i class="fa-solid fa-book-open"></i> Minhas Disciplinas</div>
+        <div class="card-subtitle">Todas as disciplinas do seu curso e classe</div>
+        <div id="disciplinasContainer" class="row g-3"></div>
+      </div>
+    </div>
+
+    <!-- PROFESSORES -->
     <div id="screen-professores" style="display:none;">
       <div class="card-modern">
-        <div class="card-title">👩‍🏫 Corpo Docente</div>
-        <div class="card-subtitle">Professores responsáveis por cada disciplina da sua turma</div>
+        <div class="card-title"><i class="fa-solid fa-chalkboard-user"></i> Professores</div>
+        <div class="card-subtitle">Todos os professores da sua classe e curso</div>
         <div id="professoresContainer" class="row g-3"></div>
       </div>
     </div>
 
-    <!-- CHAT GLOBAL (APENAS VISUALIZAÇÃO - mensagens dos professores) -->
+    <!-- CHAT -->
     <div id="screen-chat" style="display:none;">
       <div class="card-modern">
-        <div class="card-title">💬 Conversas dos Professores</div>
+        <div class="card-title"><i class="fa-solid fa-comments"></i> Chat dos Professores</div>
         <div class="card-subtitle">Acompanhe as comunicações gerais dos professores (apenas leitura)</div>
         <div class="chat-messages-area" id="chatMessagesViewer">
-          <div class="text-center text-secondary p-4">Carregando mensagens dos professores...</div>
+          <div class="empty-state"><i class="fa-regular fa-comment"></i><p>Carregando mensagens...</p></div>
         </div>
       </div>
     </div>
@@ -344,23 +489,27 @@
   if (!currentUser || currentUser.tipo !== 'alunos') window.location.href = 'index.html';
 
   let alunoData = null;
-  let allNotas = {};      // notas do professor (referência)
-  let allFaltas = {};     // faltas
+  let allAlunos = {};
+  let allNotas = {};
+  let allFaltas = {};
   let allProfessores = {};
   let allTurmas = {};
   let allDisciplinas = {};
-  let allMensagensChat = {}; // mensagens enviadas pelos professores
+  let allMensagensChat = {};
+  let desempenhoChartInstance = null;
 
   // DOM elements
   const screens = {
     dashboard: document.getElementById('screen-dashboard'),
     boletim: document.getElementById('screen-boletim'),
     faltas: document.getElementById('screen-faltas'),
+    turma: document.getElementById('screen-turma'),
+    disciplinas: document.getElementById('screen-disciplinas'),
     professores: document.getElementById('screen-professores'),
     chat: document.getElementById('screen-chat')
   };
 
-  // Tema
+  // ==================== TEMA ====================
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.body.setAttribute('data-theme', savedTheme);
   const themeToggle = document.getElementById('themeToggle');
@@ -371,11 +520,12 @@
       document.body.setAttribute('data-theme', nt);
       localStorage.setItem('theme', nt);
       themeToggle.innerHTML = `<i class="fa-solid ${nt === 'dark' ? 'fa-moon' : 'fa-sun'}"></i>`;
+      renderDashboardChart();
     };
   }
 
-  // Navegação
-  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+  // ==================== NAVEGAÇÃO ====================
+  document.querySelectorAll('.sidebar-nav a[data-target]').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
@@ -385,52 +535,46 @@
       if(screens[target]) screens[target].style.display = 'block';
       const mt = document.getElementById('mobileTitle');
       if(mt && link.querySelector('span')) mt.innerText = link.querySelector('span').innerText;
-      if(window.innerWidth < 992){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; }
+      if(window.innerWidth < 992){ 
+        document.getElementById('sidebar').classList.remove('open'); 
+        document.getElementById('overlay').style.display = 'none'; 
+      }
     });
   });
+
   document.getElementById('menuBtn')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
   });
+
   document.getElementById('overlay')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('overlay').style.display = 'none';
   });
-  document.getElementById('btnLogout')?.addEventListener('click', () => { sessionStorage.clear(); window.location.href = 'index.html'; });
 
-  // Carregar dados do aluno e inicializar
-  async function loadAlunoData() {
-    const snapAluno = await get(ref(db, `alunos/${currentUser.uid}`));
-    if(snapAluno.exists()){
-      alunoData = { id: currentUser.uid, ...snapAluno.val() };
-      document.getElementById('alunoNome').textContent = alunoData.nome || 'Aluno';
-      document.getElementById('alunoEmail').textContent = alunoData.email || '';
-      document.getElementById('alunoTurmaBadge').textContent = `Turma: ${alunoData.turma || 'Não atribuída'}`;
-      // carregar referências
-      startRealtimeListeners();
-    } else {
-      Swal.fire('Erro', 'Dados do aluno não encontrados', 'error').then(()=>{ sessionStorage.clear(); window.location.href='index.html'; });
-    }
-  }
+  document.getElementById('btnLogout')?.addEventListener('click', () => { 
+    sessionStorage.clear(); 
+    window.location.href = 'index.html'; 
+  });
 
-  function startRealtimeListeners(){
-    onValue(ref(db, 'turmas'), snap => { allTurmas = snap.val() || {}; });
-    onValue(ref(db, 'disciplinas'), snap => { allDisciplinas = snap.val() || {}; });
-    onValue(ref(db, 'professores'), snap => { allProfessores = snap.val() || {}; renderProfessores(); });
-    onValue(ref(db, 'notas'), snap => { allNotas = snap.val() || {}; renderBoletim(); renderDashboardChart(); });
-    onValue(ref(db, 'faltas'), snap => { allFaltas = snap.val() || {}; renderFaltas(); renderDashboardStats(); });
-    // Escuta apenas mensagens do chat (global teachers)
-    const chatQuery = query(ref(db, 'mensagensChatAlunos'), orderByChild('timestamp'), limitToLast(100));
-    onValue(chatQuery, snap => { allMensagensChat = snap.val() || {}; renderChatViewer(); });
+  // ==================== FUNÇÕES AUXILIARES ====================
+  function escapeHtml(str){
+    if(!str) return '';
+    return String(str).replace(/[&<>]/g, function(m){
+      if(m === '&') return '&amp;';
+      if(m === '<') return '&lt;';
+      if(m === '>') return '&gt;';
+      return m;
+    });
   }
 
   function getDisciplinasDoAluno(){
-    // Disciplinas associadas ao nível/turma: buscamos todas as disciplinas globais + específicas por classe/curso
     if(!alunoData) return [];
-    const nivel = alunoData.nivel; // 'primario' ou 'medio'
-    const classeAluno = alunoData.classe;
-    const cursoAluno = alunoData.curso;
+    const nivel = alunoData.nivel || 'primario';
+    const classeAluno = alunoData.classe || '';
+    const cursoAluno = alunoData.curso || '';
     let disciplinasSet = new Set();
+    
     Object.values(allDisciplinas).forEach(disp => {
       if(disp.tipoDisciplina === 'global') {
         disciplinasSet.add(disp.nome);
@@ -443,225 +587,585 @@
     return Array.from(disciplinasSet);
   }
 
+  function getNotasAluno(disciplina){
+    let notas = {1: null, 2: null, 3: null};
+    Object.entries(allNotas).forEach(([id, nota]) => {
+      if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined){
+        notas[nota.trimestre] = nota.valor;
+      }
+    });
+    return notas;
+  }
+
+  function calcularMedia(notas){
+    let soma = 0, count = 0;
+    for(let i=1; i<=3; i++){ 
+      if(notas[i] !== null && notas[i] !== undefined){ 
+        soma += notas[i]; 
+        count++; 
+      } 
+    }
+    return count > 0 ? soma / count : 0;
+  }
+
+  function getSituacao(media){
+    if(media >= 10) return { text: 'Aprovado', class: 'badge-aprovado' };
+    if(media === 9) return { text: 'Recuperação', class: 'badge-recuperacao' };
+    return { text: 'Reprovado', class: 'badge-reprovado' };
+  }
+
+  // ==================== CARREGAR DADOS DO ALUNO ====================
+  async function loadAlunoData() {
+    const snapAluno = await get(ref(db, `alunos/${currentUser.uid}`));
+    if(snapAluno.exists()){
+      alunoData = { id: currentUser.uid, ...snapAluno.val() };
+      document.getElementById('alunoNome').textContent = alunoData.nome || 'Aluno';
+      document.getElementById('alunoEmail').textContent = alunoData.email || '';
+      document.getElementById('alunoTurmaBadge').innerHTML = `<i class="fa-solid fa-chalkboard"></i> ${alunoData.turma || 'Não atribuída'}`;
+      
+      // Carregar todos os dados
+      await carregarTodosDados();
+    } else {
+      Swal.fire('Erro', 'Dados do aluno não encontrados', 'error').then(()=>{ 
+        sessionStorage.clear(); 
+        window.location.href='index.html'; 
+      });
+    }
+  }
+
+  // ==================== CARREGAR TODOS OS DADOS ====================
+  async function carregarTodosDados() {
+    // Carregar todos os dados de uma vez
+    const [alunosSnap, turmasSnap, disciplinasSnap, professoresSnap, notasSnap, faltasSnap, chatSnap] = await Promise.all([
+      get(ref(db, 'alunos')),
+      get(ref(db, 'turmas')),
+      get(ref(db, 'disciplinas')),
+      get(ref(db, 'professores')),
+      get(ref(db, 'notas')),
+      get(ref(db, 'faltas')),
+      get(ref(db, 'mensagensChatAlunos'))
+    ]);
+    
+    allAlunos = alunosSnap.val() || {};
+    allTurmas = turmasSnap.val() || {};
+    allDisciplinas = disciplinasSnap.val() || {};
+    allProfessores = professoresSnap.val() || {};
+    allNotas = notasSnap.val() || {};
+    allFaltas = faltasSnap.val() || {};
+    allMensagensChat = chatSnap.val() || {};
+    
+    renderAll();
+    
+    // Iniciar listeners para atualizações em tempo real
+    startRealtimeListeners();
+  }
+
+  // ==================== LISTENERS ====================
+  function startRealtimeListeners(){
+    onValue(ref(db, 'alunos'), snap => { 
+      allAlunos = snap.val() || {}; 
+      renderTurma(); 
+      renderDashboardStats();
+    });
+    
+    onValue(ref(db, 'turmas'), snap => { 
+      allTurmas = snap.val() || {}; 
+    });
+    
+    onValue(ref(db, 'disciplinas'), snap => { 
+      allDisciplinas = snap.val() || {}; 
+      renderDisciplinas();
+      renderBoletim();
+      renderFaltas();
+      renderDashboardChart();
+    });
+    
+    onValue(ref(db, 'professores'), snap => { 
+      allProfessores = snap.val() || {}; 
+      renderProfessores(); 
+    });
+    
+    onValue(ref(db, 'notas'), snap => { 
+      allNotas = snap.val() || {}; 
+      renderBoletim(); 
+      renderDashboardChart(); 
+      renderDashboardStats();
+    });
+    
+    onValue(ref(db, 'faltas'), snap => { 
+      allFaltas = snap.val() || {}; 
+      renderFaltas(); 
+      renderDashboardStats(); 
+    });
+    
+    // Chat - sem index para evitar warning
+    onValue(ref(db, 'mensagensChatAlunos'), snap => { 
+      allMensagensChat = snap.val() || {}; 
+      renderChatViewer(); 
+    });
+  }
+
+  // ==================== RENDERIZAR BOLETIM ====================
   function renderBoletim(){
     const tbody = document.getElementById('boletimBody');
     if(!tbody || !alunoData) return;
+    
     const disciplinas = getDisciplinasDoAluno();
     if(disciplinas.length === 0){
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhuma disciplina cadastrada para sua turma</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary py-4"><i class="fa-regular fa-folder-open"></i> Nenhuma disciplina cadastrada</td></tr>';
       return;
     }
+    
     let rows = '';
     for(let disciplina of disciplinas){
-      // Buscar todas as notas do aluno para esta disciplina
-      let notasTrimestre = {1: null, 2: null, 3: null};
-      Object.entries(allNotas).forEach(([id, nota]) => {
-        if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined){
-          notasTrimestre[nota.trimestre] = nota.valor;
-        }
-      });
-      let soma = 0, count = 0;
-      for(let i=1;i<=3;i++){ if(notasTrimestre[i] !== null){ soma += notasTrimestre[i]; count++; } }
-      let mediaFinal = count > 0 ? soma / count : 0;
-      let situacao = mediaFinal >= 10 ? 'Aprovado' : (mediaFinal === 9 ? 'Recuperação' : 'Reprovado');
-      let badgeClass = mediaFinal >= 10 ? 'badge-success' : (mediaFinal === 9 ? 'badge-warning' : 'badge-danger');
+      const notas = getNotasAluno(disciplina);
+      const media = calcularMedia(notas);
+      const situacao = getSituacao(media);
+      
       rows += `<tr>
         <td><strong>${escapeHtml(disciplina)}</strong></td>
-        <td>${notasTrimestre[1] !== null ? notasTrimestre[1] : '-'}</td>
-        <td>${notasTrimestre[2] !== null ? notasTrimestre[2] : '-'}</td>
-        <td>${notasTrimestre[3] !== null ? notasTrimestre[3] : '-'}</td>
-        <td class="media-final">${mediaFinal.toFixed(1)}</td>
-        <td><span class="${badgeClass} situacao">${situacao}</span></td>
+        <td style="text-align:center; font-weight:${notas[1] !== null ? '700' : '400'};" class="nota-cell">${notas[1] !== null ? notas[1] : '-'}</td>
+        <td style="text-align:center; font-weight:${notas[2] !== null ? '700' : '400'};" class="nota-cell">${notas[2] !== null ? notas[2] : '-'}</td>
+        <td style="text-align:center; font-weight:${notas[3] !== null ? '700' : '400'};" class="nota-cell">${notas[3] !== null ? notas[3] : '-'}</td>
+        <td style="text-align:center;" class="media-cell">${media.toFixed(1)}</td>
+        <td style="text-align:center;"><span class="${situacao.class}">${situacao.text}</span></td>
       </tr>`;
     }
     tbody.innerHTML = rows;
   }
 
+  // ==================== RENDERIZAR FALTAS ====================
   function renderFaltas(){
     const tbody = document.getElementById('faltasBody');
     if(!tbody || !alunoData) return;
+    
     const disciplinas = getDisciplinasDoAluno();
     let faltasPorDisciplina = {};
+    
     Object.values(allFaltas).forEach(falta => {
       if(falta.alunoId === currentUser.uid && falta.disciplina){
-        if(!faltasPorDisciplina[falta.disciplina]) faltasPorDisciplina[falta.disciplina] = { total:0, ultimaData: null };
+        if(!faltasPorDisciplina[falta.disciplina]) {
+          faltasPorDisciplina[falta.disciplina] = { total: 0, ultimaData: null };
+        }
         faltasPorDisciplina[falta.disciplina].total++;
         let dataFalta = falta.data || '';
-        if(dataFalta && (!faltasPorDisciplina[falta.disciplina].ultimaData || dataFalta > faltasPorDisciplina[falta.disciplina].ultimaData))
+        if(dataFalta && (!faltasPorDisciplina[falta.disciplina].ultimaData || dataFalta > faltasPorDisciplina[falta.disciplina].ultimaData)){
           faltasPorDisciplina[falta.disciplina].ultimaData = dataFalta;
+        }
       }
     });
+    
     if(disciplinas.length === 0 && Object.keys(faltasPorDisciplina).length === 0){
-      tbody.innerHTML = '<tr><td colspan="3" class="text-center">Nenhum registro de falta</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center text-secondary py-4"><i class="fa-regular fa-check-circle"></i> Nenhuma falta registrada</td></tr>';
       return;
     }
+    
     let rows = '';
     for(let disciplina of disciplinas){
-      let dados = faltasPorDisciplina[disciplina] || { total:0, ultimaData: null };
+      let dados = faltasPorDisciplina[disciplina] || { total: 0, ultimaData: null };
       rows += `<tr>
         <td><strong>${escapeHtml(disciplina)}</strong></td>
-        <td>${dados.total} falta(s)</td>
+        <td style="text-align:center; font-weight:${dados.total > 0 ? '700' : '400'}; color:${dados.total > 0 ? 'var(--danger)' : 'var(--text-secondary)'};">${dados.total}</td>
         <td>${dados.ultimaData ? dados.ultimaData : '---'}</td>
       </tr>`;
-    }
-    // Incluir disciplinas que tiveram faltas mas não estão na lista (caso algum professor já tenha lançado)
-    for(let disc in faltasPorDisciplina){
-      if(!disciplinas.includes(disc)){
-        let dados = faltasPorDisciplina[disc];
-        rows += `<tr><td><strong>${escapeHtml(disc)}</strong></td><td>${dados.total} falta(s)</td><td>${dados.ultimaData || '---'}</td></tr>`;
-      }
     }
     tbody.innerHTML = rows;
   }
 
-  function renderProfessores(){
-    const container = document.getElementById('professoresContainer');
-    if(!container || !alunoData) return;
-    const disciplinasAluno = getDisciplinasDoAluno();
-    if(disciplinasAluno.length === 0){
-      container.innerHTML = '<div class="col-12 text-center text-secondary">Nenhuma disciplina atribuída.</div>';
+  // ==================== RENDERIZAR TURMA ====================
+  function renderTurma(){
+    const tbody = document.getElementById('turmaBody');
+    const infoDiv = document.getElementById('turmaInfo');
+    if(!tbody || !alunoData) return;
+    
+    const turmaNome = alunoData.turma;
+    if(!turmaNome){
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-4"><i class="fa-regular fa-people-group"></i> Você não está vinculado a nenhuma turma</td></tr>';
+      if(infoDiv) infoDiv.innerHTML = '';
       return;
     }
-    // Mapear professor por disciplina: procurar professores que tenham turma igual à turma do aluno e que lecionem a disciplina
-    const turmaAluno = alunoData.turma;
-    const professoresMap = new Map(); // disciplina -> professor nome + email
-    Object.values(allProfessores).forEach(prof => {
-      const turmasProf = prof.turmas ? (Array.isArray(prof.turmas) ? prof.turmas : [prof.turmas]) : [];
-      if(turmasProf.includes(turmaAluno) && prof.disciplina){
-        professoresMap.set(prof.disciplina, { nome: prof.nome, email: prof.email, telefone: prof.telefone });
-      }
+    
+    // Buscar todos os alunos da mesma turma
+    const alunosDaTurma = Object.entries(allAlunos).filter(([id, aluno]) => 
+      aluno.turma === turmaNome && aluno.status === 'Ativo'
+    );
+    
+    // Ordenar por nome
+    alunosDaTurma.sort((a, b) => (a[1].nome || '').localeCompare(b[1].nome || ''));
+    
+    if(alunosDaTurma.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-4"><i class="fa-regular fa-users"></i> Nenhum aluno encontrado nesta turma</td></tr>';
+      if(infoDiv) infoDiv.innerHTML = '';
+      return;
+    }
+    
+    let rows = '';
+    let contador = 1;
+    alunosDaTurma.forEach(([id, aluno]) => {
+      const isMe = id === currentUser.uid;
+      rows += `<tr style="${isMe ? 'background: var(--primary-bg);' : ''}">
+        <td>${contador++}</td>
+        <td><strong>${escapeHtml(aluno.nome)} ${isMe ? '<span class="badge-turma">Você</span>' : ''}</strong></td>
+        <td>${aluno.matricula || 'N/A'}</td>
+        <td><span class="${aluno.status === 'Ativo' ? 'badge-aprovado' : 'badge-reprovado'}">${aluno.status || 'Ativo'}</span></td>
+      </tr>`;
     });
+    tbody.innerHTML = rows;
+    
+    // Informações da turma
+    if(infoDiv){
+      const turmaInfo = allTurmas ? Object.values(allTurmas).find(t => t.nomeCompleto === turmaNome || t.nome === turmaNome) : null;
+      infoDiv.innerHTML = `
+        <div class="d-flex flex-wrap gap-3 p-3 bg-primary bg-opacity-10 rounded">
+          <span><i class="fa-solid fa-people-group"></i> <strong>Total:</strong> ${alunosDaTurma.length} alunos</span>
+          ${turmaInfo?.classe ? `<span><i class="fa-solid fa-layer-group"></i> <strong>Classe:</strong> ${turmaInfo.classe}</span>` : ''}
+          ${turmaInfo?.curso ? `<span><i class="fa-solid fa-graduation-cap"></i> <strong>Curso:</strong> ${turmaInfo.curso}</span>` : ''}
+          ${turmaInfo?.sala ? `<span><i class="fa-solid fa-door-open"></i> <strong>Sala:</strong> ${turmaInfo.sala}</span>` : ''}
+        </div>
+      `;
+    }
+  }
+
+  // ==================== RENDERIZAR DISCIPLINAS ====================
+  function renderDisciplinas(){
+    const container = document.getElementById('disciplinasContainer');
+    if(!container || !alunoData) return;
+    
+    const disciplinas = getDisciplinasDoAluno();
+    
+    if(disciplinas.length === 0){
+      container.innerHTML = '<div class="col-12"><div class="empty-state"><i class="fa-regular fa-book-open"></i><p>Nenhuma disciplina cadastrada para seu curso e classe</p></div></div>';
+      return;
+    }
+    
     let html = '';
-    for(let disc of disciplinasAluno){
-      const prof = professoresMap.get(disc);
-      if(prof){
-        html += `<div class="col-md-6 col-lg-4">
-          <div class="card-modern" style="margin-bottom:0;">
-            <div class="d-flex align-items-center gap-3"><i class="fa-solid fa-chalkboard-user fa-2x" style="color:var(--primary);"></i><div><h6 class="mb-0">${escapeHtml(disc)}</h6><p class="mb-0 small text-secondary">${escapeHtml(prof.nome)}</p><small>${escapeHtml(prof.email || '')} ${prof.telefone ? '• '+escapeHtml(prof.telefone) : ''}</small></div></div>
+    for(let disciplina of disciplinas){
+      // Buscar dados da disciplina
+      const dispData = Object.values(allDisciplinas).find(d => d.nome === disciplina);
+      const cargaHoraria = dispData?.cargaHoraria || 'N/A';
+      const tipo = dispData?.tipoDisciplina || '';
+      
+      // Buscar professor desta disciplina
+      let professorNome = 'Não atribuído';
+      Object.values(allProfessores).forEach(prof => {
+        const profDisc = prof.disciplinaNome || prof.disciplina || '';
+        if(profDisc === disciplina && prof.turmaNome === alunoData.turma){
+          professorNome = prof.nome || 'Professor';
+        }
+      });
+      
+      html += `
+        <div class="col-md-6 col-lg-4">
+          <div class="item-card">
+            <div class="d-flex align-items-center gap-3">
+              <div class="item-icon"><i class="fa-solid fa-book"></i></div>
+              <div class="flex-grow-1">
+                <div class="item-nome">${escapeHtml(disciplina)}</div>
+                <div class="item-sub">
+                  <i class="fa-regular fa-clock"></i> ${cargaHoraria}h
+                  ${tipo ? `• <span class="badge-turma">${tipo}</span>` : ''}
+                </div>
+                <div class="item-detalhes">
+                  <i class="fa-solid fa-chalkboard-user"></i> ${escapeHtml(professorNome)}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>`;
-      } else {
-        html += `<div class="col-md-6 col-lg-4"><div class="card-modern" style="margin-bottom:0;"><i class="fa-regular fa-circle-question"></i> ${escapeHtml(disc)}: <span class="text-secondary">Professor não atribuído</span></div></div>`;
-      }
+        </div>
+      `;
     }
     container.innerHTML = html;
   }
 
+  // ==================== RENDERIZAR PROFESSORES ====================
+  function renderProfessores(){
+    const container = document.getElementById('professoresContainer');
+    if(!container || !alunoData) return;
+    
+    const turmaAluno = alunoData.turma;
+    const classeAluno = alunoData.classe;
+    const cursoAluno = alunoData.curso;
+    
+    // Buscar todos os professores da turma/classe/curso
+    let professoresFiltrados = [];
+    
+    Object.values(allProfessores).forEach(prof => {
+      // Verificar se o professor está vinculado à turma do aluno
+      const turmasProf = prof.turmas ? (Array.isArray(prof.turmas) ? prof.turmas : [prof.turmas]) : [];
+      const turmaProf = prof.turmaNome ? [prof.turmaNome] : [];
+      const todasTurmas = [...turmasProf, ...turmaProf];
+      
+      // Verificar se o professor leciona para a turma do aluno
+      const lecionaParaTurma = todasTurmas.includes(turmaAluno);
+      
+      // Verificar se o professor leciona alguma disciplina que o aluno tem
+      const disciplinaProf = prof.disciplinaNome || prof.disciplina || '';
+      const disciplinasAluno = getDisciplinasDoAluno();
+      const lecionaDisciplina = disciplinasAluno.includes(disciplinaProf);
+      
+      if(lecionaParaTurma && lecionaDisciplina){
+        professoresFiltrados.push(prof);
+      }
+    });
+    
+    // Se não encontrou pela turma, buscar por classe/curso
+    if(professoresFiltrados.length === 0){
+      Object.values(allProfessores).forEach(prof => {
+        const disciplinaProf = prof.disciplinaNome || prof.disciplina || '';
+        const disciplinasAluno = getDisciplinasDoAluno();
+        const lecionaDisciplina = disciplinasAluno.includes(disciplinaProf);
+        
+        if(lecionaDisciplina){
+          // Verificar se a classe/curso bate
+          const profClasse = prof.classe || '';
+          const profCurso = prof.curso || '';
+          const nivel = alunoData.nivel || 'primario';
+          
+          if(nivel === 'primario' && profClasse === classeAluno){
+            professoresFiltrados.push(prof);
+          } else if(nivel === 'medio' && profClasse === classeAluno && profCurso === cursoAluno){
+            professoresFiltrados.push(prof);
+          }
+        }
+      });
+    }
+    
+    // Remover duplicatas
+    const uniqueProfs = [];
+    const profIds = new Set();
+    professoresFiltrados.forEach(prof => {
+      if(prof.id && !profIds.has(prof.id)){
+        profIds.add(prof.id);
+        uniqueProfs.push(prof);
+      }
+    });
+    
+    if(uniqueProfs.length === 0){
+      container.innerHTML = '<div class="col-12"><div class="empty-state"><i class="fa-regular fa-chalkboard-user"></i><p>Nenhum professor encontrado para sua turma</p></div></div>';
+      return;
+    }
+    
+    let html = '';
+    uniqueProfs.forEach(prof => {
+      html += `
+        <div class="col-md-6 col-lg-4">
+          <div class="item-card">
+            <div class="d-flex align-items-center gap-3">
+              <div class="item-icon"><i class="fa-solid fa-user-tie"></i></div>
+              <div class="flex-grow-1">
+                <div class="item-nome">${escapeHtml(prof.nome || 'Professor')}</div>
+                <div class="item-sub">
+                  <i class="fa-solid fa-book"></i> ${escapeHtml(prof.disciplinaNome || prof.disciplina || 'N/A')}
+                </div>
+                <div class="item-detalhes">
+                  <i class="fa-regular fa-envelope"></i> ${escapeHtml(prof.email || 'N/A')}
+                  ${prof.telefone ? ` • <i class="fa-solid fa-phone"></i> ${escapeHtml(prof.telefone)}` : ''}
+                </div>
+                <div class="item-detalhes mt-1">
+                  <span class="${prof.tipoVinculo === 'titular' ? 'badge-aprovado' : 'badge-recuperacao'}">${prof.tipoVinculo === 'titular' ? 'Titular' : 'Substituto'}</span>
+                  ${prof.turmaNome ? ` <span class="badge-turma"><i class="fa-solid fa-chalkboard"></i> ${escapeHtml(prof.turmaNome)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // ==================== RENDERIZAR CHAT ====================
   function renderChatViewer(){
     const container = document.getElementById('chatMessagesViewer');
     if(!container) return;
-    let msgs = Object.entries(allMensagensChat).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
+    
+    let msgs = Object.entries(allMensagensChat).sort((a,b) => (a[1].timestamp||0) - (b[1].timestamp||0));
+    
     if(msgs.length === 0){
-      container.innerHTML = '<div class="text-center text-secondary p-4">Nenhuma mensagem dos professores ainda.</div>';
+      container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-comment"></i><p>Nenhuma mensagem dos professores ainda</p></div>';
       return;
     }
+    
     container.innerHTML = msgs.map(([id, msg]) => {
       let time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('pt-BR') : new Date().toLocaleString();
-      let turmaInfo = msg.turma ? `Turma: ${escapeHtml(msg.turma)}` : '';
-      let disciplinaInfo = msg.disciplina ? ` • ${escapeHtml(msg.disciplina)}` : '';
-      return `<div class="chat-message received">
-        <div class="message-bubble">
-          <div><strong>${escapeHtml(msg.professorNome || 'Professor')}</strong> ${turmaInfo}${disciplinaInfo}</div>
-          <div>${escapeHtml(msg.texto)}</div>
+      let turmaInfo = msg.turma ? `<i class="fa-solid fa-chalkboard"></i> ${escapeHtml(msg.turma)}` : '';
+      let disciplinaInfo = msg.disciplina ? ` • <i class="fa-solid fa-book"></i> ${escapeHtml(msg.disciplina)}` : '';
+      
+      return `
+        <div class="chat-message received">
+          <div class="message-bubble">
+            <div class="msg-professor">
+              <i class="fa-solid fa-user-tie"></i> ${escapeHtml(msg.remetenteNome || msg.professorNome || 'Professor')}
+              ${turmaInfo}${disciplinaInfo}
+            </div>
+            <div class="msg-texto">${escapeHtml(msg.texto)}</div>
+            <div class="message-meta">
+              <i class="fa-regular fa-clock"></i> ${time}
+              ${msg.editado ? '• <i class="fa-regular fa-pen-to-square"></i> editado' : ''}
+            </div>
+          </div>
         </div>
-        <div class="message-meta"><i class="fa-regular fa-clock"></i> ${time}</div>
-      </div>`;
+      `;
     }).join('');
     container.scrollTop = container.scrollHeight;
   }
 
+  // ==================== DASHBOARD STATS ====================
   function renderDashboardStats(){
     const disciplinas = getDisciplinasDoAluno();
     let totalMedia = 0, countDisc = 0;
+    let aprovadas = 0, reprovadas = 0, recuperacao = 0;
+    
     for(let disciplina of disciplinas){
-      let notasTrimestre = {1: null, 2: null, 3: null};
-      Object.entries(allNotas).forEach(([id, nota]) => {
-        if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined)
-          notasTrimestre[nota.trimestre] = nota.valor;
-      });
-      let soma = 0, cnt = 0;
-      for(let i=1;i<=3;i++){ if(notasTrimestre[i] !== null){ soma += notasTrimestre[i]; cnt++; } }
-      if(cnt > 0){ totalMedia += (soma / cnt); countDisc++; }
+      const notas = getNotasAluno(disciplina);
+      const media = calcularMedia(notas);
+      if(media > 0){
+        totalMedia += media;
+        countDisc++;
+        const sit = getSituacao(media);
+        if(sit.text === 'Aprovado') aprovadas++;
+        else if(sit.text === 'Recuperação') recuperacao++;
+        else reprovadas++;
+      }
     }
-    let mediaGeral = countDisc > 0 ? (totalMedia / countDisc).toFixed(1) : 0;
-    // Total de faltas
+    
+    let mediaGeral = countDisc > 0 ? (totalMedia / countDisc) : 0;
     let totalFaltas = Object.values(allFaltas).filter(f => f.alunoId === currentUser.uid).length;
-    // Total de disciplinas cursadas
     let totalDisciplinas = disciplinas.length;
-    // Percentual de presença estimado (simples baseado em faltas? apenas ilustrativo)
+    
+    // Alunos na turma
+    const turmaNome = alunoData?.turma || '';
+    const totalAlunosTurma = Object.values(allAlunos).filter(a => a.turma === turmaNome && a.status === 'Ativo').length;
+    
+    // Calcular percentual de presença aproximado
     let freqPercent = 100;
-    if(totalFaltas > 0 && totalDisciplinas > 0) freqPercent = Math.max(0, 100 - Math.min(30, totalFaltas * 2));
+    if(totalFaltas > 0 && totalDisciplinas > 0){
+      freqPercent = Math.max(0, 100 - Math.min(40, totalFaltas * 1.5));
+    }
+    
     document.getElementById('dashboardStats').innerHTML = `
-      <div class="stat-card"><i class="fa-solid fa-chart-line fa-2x" style="color:var(--primary);"></i><h3>${mediaGeral}</h3><p>Média Geral</p></div>
-      <div class="stat-card"><i class="fa-solid fa-user-check fa-2x" style="color:var(--success);"></i><h3>${freqPercent}%</h3><p>Frequência Estimada</p></div>
-      <div class="stat-card"><i class="fa-solid fa-book fa-2x" style="color:var(--warning);"></i><h3>${totalDisciplinas}</h3><p>Disciplinas</p></div>
-      <div class="stat-card"><i class="fa-solid fa-calendar-day fa-2x" style="color:var(--secondary);"></i><h3>${totalFaltas}</h3><p>Total Faltas</p></div>
+      <div class="stat-card">
+        <i class="fa-solid fa-chart-line"></i>
+        <h3>${mediaGeral.toFixed(1)}</h3>
+        <p>Média Geral</p>
+        <small style="color:var(--text-muted);">${aprovadas} aprovadas • ${recuperacao} recuperação</small>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-user-check" style="color:var(--success);"></i>
+        <h3>${Math.round(freqPercent)}%</h3>
+        <p>Frequência</p>
+        <small style="color:var(--text-muted);">${totalFaltas} faltas</small>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-book" style="color:var(--warning);"></i>
+        <h3>${totalDisciplinas}</h3>
+        <p>Disciplinas</p>
+        <small style="color:var(--text-muted);">${reprovadas} reprovadas</small>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-people-group" style="color:var(--secondary);"></i>
+        <h3>${totalAlunosTurma}</h3>
+        <p>Alunos na Turma</p>
+        <small style="color:var(--text-muted);">${turmaNome || 'Sem turma'}</small>
+      </div>
     `;
   }
 
+  // ==================== GRÁFICO DE DESEMPENHO ====================
   function renderDashboardChart(){
     const ctx = document.getElementById('desempenhoChart')?.getContext('2d');
     if(!ctx || !alunoData) return;
+    
     const disciplinas = getDisciplinasDoAluno();
     let medias = [];
     let labels = [];
+    let cores = [];
+    
     for(let disciplina of disciplinas){
-      let notasTrimestre = {1: null, 2: null, 3: null};
-      Object.entries(allNotas).forEach(([id, nota]) => {
-        if(nota.alunoId === currentUser.uid && nota.disciplina === disciplina && nota.trimestre && nota.valor !== undefined)
-          notasTrimestre[nota.trimestre] = nota.valor;
-      });
-      let soma = 0, cnt = 0;
-      for(let i=1;i<=3;i++){ if(notasTrimestre[i] !== null){ soma += notasTrimestre[i]; cnt++; } }
-      let media = cnt > 0 ? soma / cnt : 0;
+      const notas = getNotasAluno(disciplina);
+      const media = calcularMedia(notas);
       medias.push(media);
-      labels.push(disciplina.length > 15 ? disciplina.slice(0,12)+'..' : disciplina);
+      labels.push(disciplina.length > 12 ? disciplina.slice(0,10)+'..' : disciplina);
+      
+      const sit = getSituacao(media);
+      if(sit.text === 'Aprovado') cores.push('rgba(16, 185, 129, 0.8)');
+      else if(sit.text === 'Recuperação') cores.push('rgba(245, 158, 11, 0.8)');
+      else cores.push('rgba(239, 68, 68, 0.8)');
     }
-    if(window.desempenhoChartInstance) window.desempenhoChartInstance.destroy();
-    if(labels.length){
-      window.desempenhoChartInstance = new Chart(ctx, {
+    
+    if(desempenhoChartInstance) desempenhoChartInstance.destroy();
+    
+    if(labels.length > 0){
+      desempenhoChartInstance = new Chart(ctx, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Média Final (0-20)', data: medias, backgroundColor: '#6366f1', borderRadius: 8 }] },
-        options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, max: 20, title: { display: true, text: 'Nota' } } } }
+        data: { 
+          labels: labels, 
+          datasets: [{ 
+            label: 'Média Final (0-20)', 
+            data: medias, 
+            backgroundColor: cores,
+            borderColor: cores.map(c => c.replace('0.8', '1')),
+            borderWidth: 2,
+            borderRadius: 8,
+            maxBarThickness: 40,
+          }] 
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Média: ' + context.parsed.y.toFixed(1);
+                },
+                afterLabel: function(context) {
+                  const nota = context.parsed.y;
+                  if(nota >= 10) return '✅ Aprovado';
+                  if(nota === 9) return '⚠️ Recuperação';
+                  return '❌ Reprovado';
+                }
+              }
+            }
+          },
+          scales: { 
+            y: { 
+              beginAtZero: true, 
+              max: 20,
+              ticks: { stepSize: 2 },
+              grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 800, easing: 'easeInOutQuart' }
+        }
       });
     } else {
-      ctx.canvas.parentNode.innerHTML = '<div class="text-center p-4">Nenhuma nota lançada para exibir gráfico</div>';
+      ctx.canvas.parentNode.innerHTML = '<div class="empty-state"><i class="fa-regular fa-chart-bar"></i><p>Nenhuma nota lançada</p></div>';
     }
   }
 
-  function escapeHtml(str){
-    if(!str) return '';
-    return String(str).replace(/[&<>]/g, function(m){
-      if(m === '&') return '&amp;';
-      if(m === '<') return '&lt;';
-      if(m === '>') return '&gt;';
-      return m;
-    });
-  }
-
-  // Atualizar dashboard ao mudar dados
-  function refreshAll(){
+  // ==================== RENDERIZAR TUDO ====================
+  function renderAll(){
     renderDashboardStats();
     renderDashboardChart();
     renderBoletim();
     renderFaltas();
+    renderTurma();
+    renderDisciplinas();
     renderProfessores();
+    renderChatViewer();
   }
 
-  // Observadores adicionais para manter atualização
-  const observerNotas = () => { renderBoletim(); renderDashboardChart(); renderDashboardStats(); };
-  const observerFaltas = () => { renderFaltas(); renderDashboardStats(); };
-  const observerProfessores = () => { renderProfessores(); };
-  const observerDisciplinas = () => { renderBoletim(); renderFaltas(); renderProfessores(); renderDashboardStats(); renderDashboardChart(); };
-
-  // Override listeners para manter consistência
-  const originalNotas = onValue(ref(db, 'notas'), snap => { allNotas = snap.val() || {}; observerNotas(); });
-  const originalFaltas = onValue(ref(db, 'faltas'), snap => { allFaltas = snap.val() || {}; observerFaltas(); });
-  const originalProfessores = onValue(ref(db, 'professores'), snap => { allProfessores = snap.val() || {}; observerProfessores(); });
-  const originalDisciplinas = onValue(ref(db, 'disciplinas'), snap => { allDisciplinas = snap.val() || {}; observerDisciplinas(); });
-  const originalTurmas = onValue(ref(db, 'turmas'), snap => { allTurmas = snap.val() || {}; observerDisciplinas(); });
-
+  // ==================== INICIALIZAR ====================
   loadAlunoData();
+  
+  console.log('✅ SandGest - Área do Aluno carregada');
+  console.log('👤 Aluno:', currentUser?.nome || 'N/A');
+  console.log('🏫 Turma:', alunoData?.turma || 'N/A');
 </script>
 </body>
 </html>
