@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -36,15 +36,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(2px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
       z-index: 0;
       pointer-events: none;
     }
 
     [data-theme="light"] body::before {
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(2px);
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(3px);
     }
 
     /* Container principal */
@@ -68,30 +68,32 @@
       }
       
       .desktop-brand {
-        flex: 1;
+        flex: 1.2;
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(10px);
-        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(16px);
+        background: rgba(0, 0, 0, 0.35);
         border-radius: 2rem;
-        padding: 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
       }
       
       [data-theme="light"] .desktop-brand {
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.75);
         border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
       }
-      aqui qaa
+    
       .desktop-brand-content {
         text-align: center;
-        max-width: 380px;
+        max-width: 420px;
+        width: 100%;
       }
       
       .desktop-brand .logo-circle {
-        width: 160px;
-        height: 160px;
+        width: 140px;
+        height: 140px;
         margin: 0 auto 1.5rem auto;
         background: linear-gradient(145deg, #ffffff30, #ffffff10);
         border-radius: 50%;
@@ -99,80 +101,168 @@
         align-items: center;
         justify-content: center;
         backdrop-filter: blur(4px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        padding: 8px;
       }
       
       .desktop-brand .logo-circle img {
-        width: 145px;
-        height: 145px;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+      
+      [data-theme="light"] .desktop-brand .logo-circle {
+        background: white;
+        border-color: #e2e8f0;
       }
       
       .desktop-brand h2 {
         font-weight: 800;
-        font-size: 2.5rem;
-        background: linear-gradient(135deg, #FFFFFF, #D1D5FF);
+        font-size: 2.8rem;
+        background: linear-gradient(135deg, #FFFFFF, #A5B4FC);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        letter-spacing: -1px;
       }
       
       [data-theme="light"] .desktop-brand h2 {
-        background: linear-gradient(135deg, #1E2A5E, #3A4D8F);
+        background: linear-gradient(135deg, #1E2A5E, #4F46E5);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
       }
       
-      .desktop-brand p {
-        color: rgba(255, 255, 255, 0.85);
+      .desktop-brand .subtitle {
+        color: rgba(255, 255, 255, 0.8);
         font-weight: 500;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
       }
       
-      [data-theme="light"] .desktop-brand p {
-        color: #1e293b;
+      [data-theme="light"] .desktop-brand .subtitle {
+        color: #334155;
+      }
+      
+      .desktop-brand .brand-divider {
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        margin: 1rem auto 1.5rem auto;
+        border-radius: 10px;
       }
       
       .desktop-features {
-        margin-top: 2rem;
         text-align: left;
         display: inline-block;
+        width: 100%;
+        padding: 0;
       }
       
       .desktop-features li {
         list-style: none;
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.9rem;
         display: flex;
         align-items: center;
-        gap: 12px;
-        color: #f1f5f9;
-        font-size: 0.9rem;
+        gap: 14px;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.95rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+      
+      .desktop-features li:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(5px);
       }
       
       [data-theme="light"] .desktop-features li {
-        color: #0f172a;
+        color: #1e293b;
+      }
+      
+      [data-theme="light"] .desktop-features li:hover {
+        background: rgba(99, 102, 241, 0.08);
       }
       
       .desktop-features li i {
-        width: 28px;
-        color: #a5b4fc;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(99, 102, 241, 0.2);
+        border-radius: 10px;
+        color: #818cf8;
+        font-size: 1rem;
+      }
+      
+      [data-theme="light"] .desktop-features li i {
+        background: rgba(99, 102, 241, 0.12);
+      }
+      
+      /* Versão escolar info */
+      .school-info {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+      }
+      
+      [data-theme="light"] .school-info {
+        border-top-color: rgba(0, 0, 0, 0.08);
+      }
+      
+      .school-info .school-name {
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+      }
+      
+      [data-theme="light"] .school-info .school-name {
+        color: #0f172a;
+      }
+      
+      .school-info .school-motto {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+      }
+      
+      [data-theme="light"] .school-info .school-motto {
+        color: #64748b;
+      }
+      
+      .school-info .school-contact {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+      
+      [data-theme="light"] .school-info .school-contact {
+        color: #94a3b8;
+      }
+      
+      .school-info .school-contact i {
+        margin-right: 4px;
       }
       
       .desktop-form {
         flex: 1;
       }
       
-      /* Ajuste no glass-card para desktop */
       .desktop-form .glass-card {
         height: 100%;
         display: flex;
         flex-direction: column;
       }
       
-      /* Esconder logo-wrapper no desktop */
       .desktop-brand ~ .glass-card .logo-wrapper {
         display: none;
       }
@@ -185,24 +275,25 @@
       }
     }
 
+    /* ===== GLASS CARD ===== */
     .glass-card {
-      background: rgba(18, 22, 28, 0.82);
-      backdrop-filter: blur(14px);
+      background: rgba(18, 22, 28, 0.85);
+      backdrop-filter: blur(16px);
       border-radius: 2rem;
       padding: 2rem 1.8rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       transition: all 0.3s;
     }
 
     [data-theme="light"] .glass-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
 
-    /* Header com logo moderna (mobile e fallback) */
+    /* Logo */
     .logo-wrapper {
       display: flex;
       justify-content: center;
@@ -217,53 +308,59 @@
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 6px;
+    }
+    [data-theme="light"] .logo-circle {
+      background: white;
+      border-color: #e2e8f0;
     }
     .logo-circle img {
-      width: 74px;
-      height: 74px;
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       object-fit: cover;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
     .login-header h3 {
-      font-weight: 700;
+      font-weight: 800;
       font-size: 1.9rem;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.5px;
       background: linear-gradient(135deg, #FFFFFF, #D1D5FF);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.15rem;
     }
     [data-theme="light"] .login-header h3 {
-      background: linear-gradient(135deg, #1E2A5E, #3A4D8F);
+      background: linear-gradient(135deg, #1E2A5E, #4F46E5);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
     .login-header p {
-      color: rgba(255,255,255,0.8);
+      color: rgba(255,255,255,0.7);
       font-weight: 500;
+      font-size: 0.95rem;
     }
     [data-theme="light"] .login-header p {
-      color: #1e293b;
+      color: #475569;
     }
 
-    /* método toggle estilizado */
+    /* Método toggle */
     .login-method-toggle {
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 60px;
       padding: 4px;
       display: flex;
       gap: 6px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
       margin-bottom: 1.8rem;
     }
     [data-theme="light"] .login-method-toggle {
-      background: #eef2ff;
-      border-color: #cbd5e1;
+      background: #f1f5f9;
+      border-color: #e2e8f0;
     }
     .method-btn {
       flex: 1;
@@ -272,24 +369,19 @@
       padding: 10px 0;
       border-radius: 40px;
       font-weight: 600;
-      font-size: 0.9rem;
-      color: #e2e8f0;
+      font-size: 0.85rem;
+      color: #94a3b8;
       cursor: pointer;
-      transition: 0.2s;
+      transition: 0.25s ease;
     }
-    [data-theme="light"] .method-btn {
-      color: #1e293b;
-    }
+    .method-btn i { margin-right: 8px; }
     .method-btn.active {
-      background: #4361ee;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: white;
-      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
-    }
-    .method-btn i {
-      margin-right: 8px;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
     }
 
-    /* inputs com design clean */
+    /* ===== INPUTS CORRIGIDOS ===== */
     .form-label {
       font-weight: 600;
       margin-bottom: 0.5rem;
@@ -300,81 +392,177 @@
     [data-theme="light"] .form-label {
       color: #0f172a;
     }
+    
     .input-group-text {
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-right: none;
-      color: #cbd5e6;
+      color: #94a3b8;
+      border-radius: 1rem 0 0 1rem;
+      padding: 0 16px;
     }
     [data-theme="light"] .input-group-text {
-      background: #ffffff;
-      border-color: #cbd5e1;
-      color: #334155;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #64748b;
     }
-    .form-control, .form-select {
-      background: rgba(10, 14, 23, 0.75);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 1rem;
-      padding: 12px 16px;
-      color: #f8fafc;
+    
+    .form-control {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 0 1rem 1rem 0 !important;
+      padding: 12px 16px !important;
+      color: #f8fafc !important;
       font-weight: 500;
       backdrop-filter: blur(4px);
+      transition: all 0.25s ease;
     }
-    [data-theme="light"] .form-control, [data-theme="light"] .form-select {
-      background: white;
-      border-color: #cbd5e1;
-      color: #0f172a;
+    
+    /* CORREÇÃO: Inputs no modo light */
+    [data-theme="light"] .form-control {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
+    
+    [data-theme="light"] .form-control:focus {
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      background: #ffffff !important;
+    }
+    
+    [data-theme="light"] .form-control::placeholder {
+      color: #94a3b8 !important;
+    }
+    
     .form-control:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
-      background: rgba(20, 25, 40, 0.9);
+      border-color: #818cf8 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+      background: rgba(255, 255, 255, 0.1) !important;
     }
+    
+    /* ===== DETECÇÃO DE USUÁRIO MELHORADA ===== */
+    .user-type-detection {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    [data-theme="light"] .user-type-detection {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+    
+    .user-type-detection .status-text {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    
+    [data-theme="light"] .user-type-detection .status-text {
+      color: #64748b;
+    }
+    
+    .user-type-detection .status-text i {
+      color: #818cf8;
+    }
+    
+    .user-type-detection .status-text.found {
+      color: #10b981;
+    }
+    
+    .user-type-detection .status-text.found i {
+      color: #10b981;
+    }
+    
+    .user-type-detection .status-text.not-found {
+      color: #ef4444;
+    }
+    
+    .user-type-detection .status-text.not-found i {
+      color: #ef4444;
+    }
+    
+    .user-type-detection .status-text.loading i {
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* badge de detecção */
     .user-type-badge {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 4px 14px;
       border-radius: 30px;
       font-size: 0.7rem;
       font-weight: 700;
-      margin-left: 12px;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .admin-badge { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
     .teacher-badge { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
     .student-badge { background: linear-gradient(135deg, #10b981, #047857); color: white; }
+    .not-found-badge { background: #64748b; color: white; }
+    
     .user-type-info {
-      background: rgba(0,0,0,0.35);
+      background: rgba(0,0,0,0.25);
       border-radius: 1rem;
       padding: 12px 16px;
       font-size: 0.8rem;
-      border-left: 4px solid #4361ee;
-      margin-top: 1rem;
+      border-left: 3px solid #6366f1;
+      margin-top: 0.75rem;
     }
     [data-theme="light"] .user-type-info {
       background: #f1f5f9;
     }
+    .user-type-info i { width: 20px; color: #6366f1; }
+    .user-type-info .info-title { font-weight: 600; }
+    
+    .user-type-info .info-detail {
+      color: var(--text-secondary, #94a3b8);
+      font-size: 0.75rem;
+      margin-top: 2px;
+    }
+    [data-theme="light"] .user-type-info .info-detail {
+      color: #64748b;
+    }
 
-    /* botão principal */
+    /* Botão principal */
     .btn-primary-custom {
-      background: linear-gradient(95deg, #4361ee, #3a0ca3);
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       border: none;
       border-radius: 60px;
       padding: 14px;
       font-weight: 700;
       font-size: 1rem;
       color: white;
-      transition: all 0.2s;
-      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
     }
     .btn-primary-custom:hover {
-      transform: scale(1.02);
-      background: linear-gradient(95deg, #5a77ff, #4a1db0);
-      box-shadow: 0 12px 28px rgba(67, 97, 238, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(99, 102, 241, 0.45);
+    }
+    .btn-primary-custom:active {
+      transform: scale(0.98);
+    }
+    .btn-primary-custom:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    /* tema toggle refinado */
+    /* Tema toggle */
     .theme-toggle-glass {
       position: fixed;
       top: 24px;
@@ -387,40 +575,37 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
       cursor: pointer;
       z-index: 999;
       color: white;
       font-size: 1.3rem;
-      transition: 0.2s;
+      transition: 0.3s ease;
     }
     [data-theme="light"] .theme-toggle-glass {
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.8);
       color: #1e293b;
-      border-color: #94a3b8;
+      border-color: #e2e8f0;
     }
     .theme-toggle-glass:hover {
-      transform: rotate(20deg);
+      transform: rotate(30deg) scale(1.05);
     }
 
-    /* responsivo mobile mantém o estilo original */
-    @media (max-width: 480px) {
-      .glass-card {
-        padding: 1.5rem;
-      }
-      .login-header h3 {
-        font-size: 1.6rem;
-      }
-    }
     .loading-spinner i {
       animation: spin 0.8s linear infinite;
+      color: #818cf8;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
     .demo-hint {
       font-size: 0.7rem;
       text-align: center;
       margin-top: 1.2rem;
-      opacity: 0.7;
+      opacity: 0.6;
+    }
+
+    /* Responsivo */
+    @media (max-width: 480px) {
+      .glass-card { padding: 1.5rem; }
+      .login-header h3 { font-size: 1.6rem; }
     }
   </style>
 </head>
@@ -430,26 +615,43 @@
   </div>
 
   <div class="login-container">
-    <!-- Desktop: estrutura com 2 colunas -->
     <div class="split-desktop">
-      <!-- Lado esquerdo - Branding (aparece só em desktop) -->
+      <!-- Lado esquerdo - Branding com informações da escola -->
       <div class="desktop-brand">
         <div class="desktop-brand-content">
           <div class="logo-circle">
-            <img src="logo.jpg" alt="Logo SandGest" onerror="this.src='https://via.placeholder.com/145?text=SG'">
+            <img src="logo.jpg" alt="Logo SandGest" onerror="this.src='https://via.placeholder.com/140?text=SG'">
           </div>
           <h2>SandGest</h2>
-          <p>Portal Educacional Integrado</p>
+          <p class="subtitle">Portal Educacional Integrado</p>
+          
+          <div class="brand-divider"></div>
+          
           <ul class="desktop-features">
             <li><i class="fas fa-chalkboard-user"></i> Gestão acadêmica completa</li>
             <li><i class="fas fa-chart-line"></i> Desempenho em tempo real</li>
             <li><i class="fas fa-shield-alt"></i> Acesso seguro e personalizado</li>
-            <li><i class="fas fa-bugs"></i> Evitando erros humanos e facilitando tarefas</li>
+            <li><i class="fas fa-robot"></i> Automação inteligente de tarefas</li>
           </ul>
+          
+          <!-- Informações da Escola -->
+          <div class="school-info">
+            <div class="school-name"><i class="fas fa-school"></i> Instituto Médio de Administração Privado Sandnney</div>
+            <div class="school-motto">"Educação com Excelência e Inovação"</div>
+            <div class="school-contact">
+              <span><i class="fas fa-phone"></i> +244 956 915 717</span>
+              <span><i class="fas fa-envelope"></i> contato@sandgest.ao</span>
+              <span><i class="fas fa-map-pin"></i> Zango 3, Icolo e Bengo</span>
+            </div>
+            <div class="school-contact" style="font-size:0.7rem; opacity:0.5; margin-top:0.5rem;">
+              <span><i class="fas fa-graduation-cap"></i> Ensino Primário e Médio</span>
+              <span><i class="fas fa-calendar-alt"></i> Ano Letivo 2025/2026</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Lado direito - Formulário (igual ao original) -->
+      <!-- Lado direito - Formulário -->
       <div class="desktop-form">
         <div class="glass-card">
           <div class="logo-wrapper">
@@ -476,7 +678,7 @@
               <label class="form-label"><i class="fas fa-at me-1"></i>E-mail institucional</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                <input type="email" id="email" class="form-control" placeholder="example@gmail.com" autocomplete="email">
+                <input type="email" id="email" class="form-control" placeholder="exemplo@escola.com" autocomplete="email">
               </div>
             </div>
 
@@ -497,23 +699,40 @@
             </div>
             
             <div class="loading-spinner text-center" id="loadingSpinner" style="display: none;">
-              <i class="fas fa-circle-notch fa-2x" style="color: #818cf8;"></i>
-              <p class="mt-2 mb-0 small">autenticando...</p>
+              <i class="fas fa-circle-notch fa-2x"></i>
+              <p class="mt-2 mb-0 small" style="color: var(--text-secondary, #94a3b8);">autenticando...</p>
             </div>
 
-            <div class="mb-3" id="userTypeSection">
-              <label class="form-label">Tipo de usuário <i class="fas fa-users"></i></label>
-              <div id="userTypeIndicator" class="form-control" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);">
-                <span id="detectedUserType">Digite seu e-mail ou matrícula</span>
-                <span id="userTypeBadge" class="user-type-badge"></span>
+            <!-- DETECÇÃO DE USUÁRIO MELHORADA -->
+            <div class="mb-3">
+              <label class="form-label" style="font-size:0.75rem; opacity:0.7;">
+                <i class="fas fa-user-check"></i> Detecção automática
+              </label>
+              <div class="user-type-detection" id="userTypeDetection">
+                <div class="status-text" id="detectionStatus">
+                  <i class="fas fa-circle-info"></i>
+                  <span id="detectedUserType">Digite seu e-mail ou matrícula</span>
+                </div>
+                <span id="userTypeBadge" class="user-type-badge" style="display:none;"></span>
               </div>
-              <small class="text-muted mt-1 d-block">detectado automaticamente</small>
             </div>
             
             <div id="userTypeInfo" class="user-type-info" style="display: none;">
-              <div id="adminInfo" style="display: none;"><i class="fas fa-shield-alt me-2"></i> <strong>Administrador:</strong> gestão total (alunos, professores, turmas, financeiro)</div>
-              <div id="teacherInfo" style="display: none;"><i class="fas fa-chalkboard-user me-2"></i> <strong>Professor:</strong> notas, frequência, turmas</div>
-              <div id="studentInfo" style="display: none;"><i class="fas fa-graduation-cap me-2"></i> <strong>Aluno:</strong> boletim, horários, conteúdo</div>
+              <div id="adminInfo" style="display: none;">
+                <i class="fas fa-shield-alt"></i> 
+                <span class="info-title">Administrador</span>
+                <div class="info-detail">Acesso total: alunos, professores, turmas, financeiro e configurações</div>
+              </div>
+              <div id="teacherInfo" style="display: none;">
+                <i class="fas fa-chalkboard-user"></i> 
+                <span class="info-title">Professor</span>
+                <div class="info-detail">Lançar notas, registrar chamada, gerenciar turmas e comunicar com alunos</div>
+              </div>
+              <div id="studentInfo" style="display: none;">
+                <i class="fas fa-graduation-cap"></i> 
+                <span class="info-title">Aluno</span>
+                <div class="info-detail">Consultar boletim, ver faltas, professores e disciplinas da turma</div>
+              </div>
             </div>
             
             <button type="submit" class="btn btn-primary-custom w-100 mt-2" id="loginButton">
@@ -546,7 +765,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    let loginMethod = 'email'; // email ou matricula
+    let loginMethod = 'email';
 
     const userTypeMap = {
       'Admin': { name: 'Administrador', badgeClass: 'admin-badge', badgeText: 'ADMIN', path: 'adm.html' },
@@ -554,6 +773,7 @@
       'alunos': { name: 'Aluno', badgeClass: 'student-badge', badgeText: 'ALUNO', path: 'aluno.html' }
     };
 
+    // ===== FUNÇÕES DE BUSCA =====
     async function findUserByEmail(email) {
       if (!email) return null;
       const collections = ['Admin', 'professores', 'alunos'];
@@ -575,7 +795,6 @@
 
     async function findUserByMatricula(matricula) {
       if (!matricula) return null;
-      // Admin (id ou idCoordenador/idProfessor)
       try {
         const adminSnap = await get(ref(db, 'Admin'));
         if (adminSnap.exists()) {
@@ -612,8 +831,11 @@
       return null;
     }
 
+    // ===== DETECÇÃO MELHORADA =====
     async function updateUserTypeIndicator(emailValue, matriculaValue) {
-      const indicatorSpan = document.getElementById('detectedUserType');
+      const detectionDiv = document.getElementById('userTypeDetection');
+      const statusDiv = document.getElementById('detectionStatus');
+      const statusText = document.getElementById('detectedUserType');
       const badgeSpan = document.getElementById('userTypeBadge');
       const infoDiv = document.getElementById('userTypeInfo');
       const adminDiv = document.getElementById('adminInfo');
@@ -624,65 +846,84 @@
       teacherDiv.style.display = 'none';
       studentDiv.style.display = 'none';
       infoDiv.style.display = 'none';
+      badgeSpan.style.display = 'none';
+      
+      // Reset status
+      statusDiv.className = 'status-text';
       
       if (loginMethod === 'email' && emailValue) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
-          indicatorSpan.textContent = "E-mail inválido";
-          badgeSpan.textContent = '';
-          badgeSpan.className = 'user-type-badge';
+          statusText.textContent = "E-mail inválido";
+          statusDiv.className = 'status-text not-found';
+          badgeSpan.textContent = 'INVÁLIDO';
+          badgeSpan.className = 'user-type-badge not-found-badge';
+          badgeSpan.style.display = 'inline-block';
           return;
         }
-        indicatorSpan.textContent = "verificando...";
+        statusText.textContent = "🔍 Verificando...";
+        statusDiv.className = 'status-text loading';
+        
         const result = await findUserByEmail(emailValue);
         if (result) {
           const tInfo = userTypeMap[result.type];
           if (tInfo) {
-            indicatorSpan.textContent = tInfo.name;
+            statusText.textContent = `✅ ${tInfo.name} encontrado`;
+            statusDiv.className = 'status-text found';
             badgeSpan.textContent = tInfo.badgeText;
             badgeSpan.className = `user-type-badge ${tInfo.badgeClass}`;
+            badgeSpan.style.display = 'inline-block';
             infoDiv.style.display = 'block';
             if (result.type === 'Admin') adminDiv.style.display = 'block';
             else if (result.type === 'professores') teacherDiv.style.display = 'block';
             else if (result.type === 'alunos') studentDiv.style.display = 'block';
           }
         } else {
-          indicatorSpan.textContent = "E-mail não cadastrado";
-          badgeSpan.textContent = '';
-          badgeSpan.className = 'user-type-badge';
+          statusText.textContent = "❌ E-mail não cadastrado";
+          statusDiv.className = 'status-text not-found';
+          badgeSpan.textContent = 'NÃO ENCONTRADO';
+          badgeSpan.className = 'user-type-badge not-found-badge';
+          badgeSpan.style.display = 'inline-block';
         }
       } 
       else if (loginMethod === 'matricula' && matriculaValue) {
         if (!matriculaValue.trim()) {
-          indicatorSpan.textContent = "Digite a matrícula/ID";
-          badgeSpan.textContent = '';
+          statusText.textContent = "Digite a matrícula/ID";
+          statusDiv.className = 'status-text';
+          badgeSpan.style.display = 'none';
           return;
         }
-        indicatorSpan.textContent = "verificando matrícula...";
+        statusText.textContent = "🔍 Verificando matrícula...";
+        statusDiv.className = 'status-text loading';
+        
         const result = await findUserByMatricula(matriculaValue);
         if (result) {
           const tInfo = userTypeMap[result.type];
           if (tInfo) {
-            indicatorSpan.textContent = tInfo.name;
+            statusText.textContent = `✅ ${tInfo.name} encontrado`;
+            statusDiv.className = 'status-text found';
             badgeSpan.textContent = tInfo.badgeText;
             badgeSpan.className = `user-type-badge ${tInfo.badgeClass}`;
+            badgeSpan.style.display = 'inline-block';
             infoDiv.style.display = 'block';
             if (result.type === 'Admin') adminDiv.style.display = 'block';
             else if (result.type === 'professores') teacherDiv.style.display = 'block';
             else if (result.type === 'alunos') studentDiv.style.display = 'block';
           }
         } else {
-          indicatorSpan.textContent = "Matrícula não encontrada";
-          badgeSpan.textContent = '';
-          badgeSpan.className = 'user-type-badge';
+          statusText.textContent = "❌ Matrícula não encontrada";
+          statusDiv.className = 'status-text not-found';
+          badgeSpan.textContent = 'NÃO ENCONTRADO';
+          badgeSpan.className = 'user-type-badge not-found-badge';
+          badgeSpan.style.display = 'inline-block';
         }
       } else {
-        indicatorSpan.textContent = "Digite seu e-mail ou matrícula para detecção";
-        badgeSpan.textContent = '';
-        badgeSpan.className = 'user-type-badge';
+        statusText.textContent = "Digite seu e-mail ou matrícula para detecção";
+        statusDiv.className = 'status-text';
+        badgeSpan.style.display = 'none';
       }
     }
 
-    // toggles de método
+    // ===== EVENTOS DOS TOGGLES =====
     document.getElementById('btnEmailMethod').addEventListener('click', () => {
       loginMethod = 'email';
       document.getElementById('btnEmailMethod').classList.add('active');
@@ -691,9 +932,8 @@
       document.getElementById('matriculaField').style.display = 'none';
       document.getElementById('email').required = true;
       document.getElementById('matricula').required = false;
-      document.getElementById('email').value = '';
       document.getElementById('matricula').value = '';
-      updateUserTypeIndicator('', '');
+      updateUserTypeIndicator(document.getElementById('email').value, '');
     });
 
     document.getElementById('btnMatriculaMethod').addEventListener('click', () => {
@@ -705,8 +945,7 @@
       document.getElementById('email').required = false;
       document.getElementById('matricula').required = true;
       document.getElementById('email').value = '';
-      document.getElementById('matricula').value = '';
-      updateUserTypeIndicator('', '');
+      updateUserTypeIndicator('', document.getElementById('matricula').value);
     });
 
     let debounceTimer;
@@ -717,16 +956,16 @@
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         if (loginMethod === 'email') updateUserTypeIndicator(e.target.value, '');
-      }, 500);
+      }, 400);
     });
     matriculaInput.addEventListener('input', (e) => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         if (loginMethod === 'matricula') updateUserTypeIndicator('', e.target.value);
-      }, 500);
+      }, 400);
     });
 
-    // LOGIN SUBMIT
+    // ===== LOGIN =====
     const loginForm = document.getElementById('loginForm');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const loginBtn = document.getElementById('loginButton');
@@ -738,20 +977,36 @@
       const password = document.getElementById('password').value;
       
       if (!password) {
-        Swal.fire("Atenção", "Digite sua senha para continuar.", "warning");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          text: 'Digite sua senha para continuar.',
+          confirmButtonColor: '#6366f1'
+        });
         return;
       }
       if (loginMethod === 'email' && !emailVal) {
-        Swal.fire("Atenção", "Informe o e-mail.", "warning");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          text: 'Informe o e-mail.',
+          confirmButtonColor: '#6366f1'
+        });
         return;
       }
       if (loginMethod === 'matricula' && !matriculaVal) {
-        Swal.fire("Atenção", "Informe a matrícula/ID.", "warning");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          text: 'Informe a matrícula/ID.',
+          confirmButtonColor: '#6366f1'
+        });
         return;
       }
       
       loadingSpinner.style.display = 'block';
       loginBtn.disabled = true;
+      loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Entrando...';
       
       try {
         let userResult = null;
@@ -762,17 +1017,29 @@
         }
         
         if (!userResult) {
-          Swal.fire("Erro", loginMethod === 'email' ? "E-mail não localizado." : "Matrícula não encontrada.", "error");
+          Swal.fire({
+            icon: 'error',
+            title: 'Usuário não encontrado',
+            text: loginMethod === 'email' ? 'E-mail não localizado no sistema.' : 'Matrícula não encontrada.',
+            confirmButtonColor: '#ef4444'
+          });
           loadingSpinner.style.display = 'none';
           loginBtn.disabled = false;
+          loginBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Entrar';
           return;
         }
         
         const storedPwd = userResult.data.password || 'escola123';
         if (storedPwd !== password) {
-          Swal.fire("Erro", "Senha incorreta.", "error");
+          Swal.fire({
+            icon: 'error',
+            title: 'Senha incorreta',
+            text: 'Verifique sua senha e tente novamente.',
+            confirmButtonColor: '#ef4444'
+          });
           loadingSpinner.style.display = 'none';
           loginBtn.disabled = false;
+          loginBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Entrar';
           return;
         }
         
@@ -788,24 +1055,33 @@
         
         sessionStorage.setItem('currentUser', JSON.stringify(userInfo));
         const redirectPath = userTypeMap[userResult.type]?.path || 'index.html';
+        
         await Swal.fire({
           icon: 'success',
-          title: `Bem-vindo(a), ${userResult.data.nome || 'Usuário'}!`,
+          title: `👋 Bem-vindo(a), ${userResult.data.nome || 'Usuário'}!`,
           text: `Redirecionando para área ${userTypeMap[userResult.type]?.name || 'sistema'}`,
           timer: 1800,
           showConfirmButton: false,
+          willClose: () => {
+            window.location.href = redirectPath;
+          }
         });
-        window.location.href = redirectPath;
       } catch (err) {
         console.error(err);
-        Swal.fire("Erro inesperado", "Não foi possível concluir o login. Tente mais tarde.", "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro inesperado',
+          text: 'Não foi possível concluir o login. Tente mais tarde.',
+          confirmButtonColor: '#ef4444'
+        });
       } finally {
         loadingSpinner.style.display = 'none';
         loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Entrar';
       }
     });
 
-    // TEMA (CLARO/ESCURO) com persistência
+    // ===== TEMA =====
     const themeBtn = document.getElementById('themeToggleGlass');
     const themeIconEl = document.getElementById('themeIcon');
     function setTheme(theme) {
@@ -825,7 +1101,7 @@
       setTheme(newTheme);
     });
 
-    // Inicializar placeholder visual da detecção
+    // ===== INICIALIZAR =====
     updateUserTypeIndicator('', '');
   </script>
 </body>
