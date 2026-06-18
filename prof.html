@@ -265,7 +265,6 @@
             padding-left: 0.75rem;
         }
 
-        /* Botões */
         .btn-primary-custom {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
@@ -315,7 +314,25 @@
             color: var(--primary);
         }
 
-        /* Cards */
+        .btn-danger-custom {
+            background: var(--danger);
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
         .record-card, .student-list-item, .professor-item-card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
@@ -337,7 +354,6 @@
             transform: translateX(5px);
         }
 
-        /* Chat Turmas */
         .turma-chat-selector {
             display: flex;
             gap: 0.5rem;
@@ -455,7 +471,6 @@
             flex: 1;
         }
 
-        /* Badges */
         .badge-modern {
             background: var(--primary);
             color: white;
@@ -495,6 +510,15 @@
             backdrop-filter: blur(4px);
             z-index: 1040;
             display: none;
+        }
+
+        .security-badge {
+            background: linear-gradient(135deg, #f72585, #7209b7);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            margin-left: 8px;
         }
 
         ::-webkit-scrollbar {
@@ -597,7 +621,7 @@
                 </div>
                 <button id="btnCarregarChamada" class="btn-primary-custom w-100 mb-4"><i class="fa-solid fa-clipboard-list"></i> Iniciar Chamada</button>
                 <div id="frequenciaContainer" style="display:none;">
-                    <div class="d-flex justify-content-between mb-3"><span class="fw-bold">✅ Marcar presenças</span><button id="btnMarcarTodos" class="btn-outline-custom">Todos Presentes</button></div>
+                    <div class="d-flex justify-content-between mb-3"><span class="fw-bold"><i class="fa-solid fa-check-circle" style="color: var(--success);"></i> Marcar presenças</span><button id="btnMarcarTodos" class="btn-outline-custom"><i class="fa-solid fa-check-double"></i> Todos Presentes</button></div>
                     <div id="freqCardsList" class="row g-2"></div>
                     <button id="btnSalvarFrequencia" class="btn-primary-custom mt-4"><i class="fa-solid fa-save"></i> Salvar</button>
                 </div>
@@ -608,9 +632,9 @@
         <div id="screen-registros" style="display:none;">
             <div class="glass-card">
                 <div class="section-title"><i class="fa-solid fa-timeline"></i> Meus Registros</div>
-                <div class="mb-3 d-flex gap-2">
-                    <button id="tabNotasReg" class="btn-primary-custom">📄 Notas</button>
-                    <button id="tabFaltasReg" class="btn-outline-custom">⚠️ Faltas</button>
+                <div class="mb-3 d-flex gap-2 flex-wrap">
+                    <button id="tabNotasReg" class="btn-primary-custom"><i class="fa-solid fa-file-lines"></i> Notas</button>
+                    <button id="tabFaltasReg" class="btn-outline-custom"><i class="fa-solid fa-calendar-xmark"></i> Faltas</button>
                 </div>
                 <div id="registrosNotasList" class="mt-3"></div>
                 <div id="registrosFaltasList" style="display:none;"></div>
@@ -669,6 +693,7 @@
                 <div class="section-title"><i class="fa-solid fa-id-card"></i> Minhas Informações</div>
                 <div id="minhasInfoContainer" class="p-3"></div>
                 <button id="btnEditarInfo" class="btn-primary-custom mt-3"><i class="fa-regular fa-pen-to-square"></i> Editar Informações</button>
+                <button id="btnAlterarSenhaSeguranca" class="btn-outline-custom mt-3 ms-2"><i class="fa-solid fa-key"></i> Alterar Código de Segurança</button>
             </div>
         </div>
     </div>
@@ -706,6 +731,187 @@
     let allMensagensChatGlobal = {};
     let allMensagensChatAlunos = {};
     let currentTurmaChat = null;
+
+    // ==================== FUNÇÃO DE SEGURANÇA DO PROFESSOR ====================
+    async function verificarSenhaSegurancaProfessor(operacao) {
+        if (!profData) {
+            Swal.fire('Erro', 'Dados do professor não carregados', 'error');
+            return false;
+        }
+
+        // Se o professor não tem profKey definida, não pede verificação
+        if (!profData.profKey) {
+            return true;
+        }
+
+        const { value: senhaSeguranca } = await Swal.fire({
+            title: '<i class="fa-solid fa-shield-haltered" style="color: var(--primary);"></i> Verificação de Segurança',
+            html: `
+                <div class="text-center mb-3">
+                    <i class="fa-solid fa-shield-haltered" style="font-size: 3rem; color: var(--primary);"></i>
+                    <p class="mt-2">Para <strong>${operacao}</strong>, confirme seu <strong>código de segurança</strong>.</p>
+                    <p class="small text-muted">Este código foi definido no seu cadastro como professor.</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fa-solid fa-key"></i> Código de Segurança</label>
+                    <input type="password" id="senhaSegurancaInput" class="form-control" placeholder="Digite seu código de segurança" required>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-check"></i> Confirmar',
+            cancelButtonText: '<i class="fa-solid fa-xmark"></i> Cancelar',
+            preConfirm: () => {
+                const senha = document.getElementById('senhaSegurancaInput')?.value;
+                if (!senha) {
+                    Swal.showValidationMessage('Digite seu código de segurança');
+                    return false;
+                }
+                return senha;
+            }
+        });
+
+        if (!senhaSeguranca) {
+            return false;
+        }
+
+        if (profData.profKey !== senhaSeguranca) {
+            await Swal.fire({
+                title: '⛔ Acesso Negado!',
+                text: 'Código de segurança incorreto. Operação cancelada.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        return true;
+    }
+
+    // ==================== FUNÇÕES DE EXCLUSÃO E EDIÇÃO COM SEGURANÇA ====================
+    async function excluirItemComSeguranca(path, id, nomeItem) {
+        const senhaValida = await verificarSenhaSegurancaProfessor(`excluir ${nomeItem}`);
+        if (!senhaValida) return;
+
+        const result = await Swal.fire({
+            title: `<i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i> Excluir ${nomeItem}?`,
+            text: 'Esta ação não pode ser desfeita',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Sim, excluir',
+            cancelButtonText: '<i class="fa-solid fa-xmark"></i> Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await remove(ref(db, `${path}/${id}`));
+                Swal.fire('✅ Excluído!', `${nomeItem} removido com sucesso`, 'success');
+                return true;
+            } catch (error) {
+                console.error('Erro ao excluir:', error);
+                Swal.fire('Erro', 'Não foi possível excluir', 'error');
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // ==================== FUNÇÃO DE EDIÇÃO COM SEGURANÇA ====================
+    async function editarItemComSeguranca(path, id, dadosAtuais, camposHtml, nomeItem) {
+        const senhaValida = await verificarSenhaSegurancaProfessor(`editar ${nomeItem}`);
+        if (!senhaValida) return null;
+
+        const { value: formValues } = await Swal.fire({
+            title: `<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Editar ${nomeItem}`,
+            html: camposHtml,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-save"></i> Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark"></i> Cancelar',
+            width: '600px',
+            preConfirm: () => {
+                const dados = {};
+                const inputs = document.querySelectorAll('.edit-field');
+                inputs.forEach(input => {
+                    dados[input.dataset.field] = input.value;
+                });
+                return dados;
+            }
+        });
+
+        if (formValues) {
+            try {
+                await update(ref(db, `${path}/${id}`), formValues);
+                Swal.fire('✅ Atualizado!', `${nomeItem} atualizado com sucesso`, 'success');
+                return formValues;
+            } catch (error) {
+                console.error('Erro ao editar:', error);
+                Swal.fire('Erro', 'Não foi possível editar', 'error');
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // ==================== FUNÇÃO PARA ALTERAR CÓDIGO DE SEGURANÇA ====================
+    document.getElementById('btnAlterarSenhaSeguranca')?.addEventListener('click', async () => {
+        if (!profData) {
+            Swal.fire('Erro', 'Dados não carregados', 'error');
+            return;
+        }
+
+        // Primeiro verificar a senha atual
+        const { value: senhaAtual } = await Swal.fire({
+            title: '<i class="fa-solid fa-key"></i> Alterar Código de Segurança',
+            html: `
+                <div class="mb-3 text-start">
+                    <label class="form-label">Código Atual *</label>
+                    <input type="password" id="senhaAtual" class="form-control" placeholder="Digite seu código atual" required>
+                </div>
+                <div class="mb-3 text-start">
+                    <label class="form-label">Novo Código *</label>
+                    <input type="password" id="novaSenha" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                <div class="mb-3 text-start">
+                    <label class="form-label">Confirmar Novo Código *</label>
+                    <input type="password" id="confirmarSenha" class="form-control" placeholder="Digite novamente" required>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-check"></i> Alterar',
+            cancelButtonText: '<i class="fa-solid fa-xmark"></i> Cancelar',
+            preConfirm: () => {
+                const atual = document.getElementById('senhaAtual')?.value;
+                const nova = document.getElementById('novaSenha')?.value;
+                const confirmar = document.getElementById('confirmarSenha')?.value;
+
+                if (!atual) {
+                    Swal.showValidationMessage('Digite seu código atual');
+                    return false;
+                }
+                if (!nova || nova.length < 6) {
+                    Swal.showValidationMessage('Novo código deve ter pelo menos 6 caracteres');
+                    return false;
+                }
+                if (nova !== confirmar) {
+                    Swal.showValidationMessage('Os códigos não coincidem');
+                    return false;
+                }
+                if (atual !== profData.profKey) {
+                    Swal.showValidationMessage('Código atual incorreto');
+                    return false;
+                }
+                return { nova: nova };
+            }
+        });
+
+        if (senhaAtual) {
+            await update(ref(db, `professores/${currentUser.uid}`), {
+                profKey: senhaAtual.nova
+            });
+            profData.profKey = senhaAtual.nova;
+            Swal.fire('✅ Sucesso!', 'Código de segurança alterado com sucesso', 'success');
+        }
+    });
 
     // Theme
     const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -848,6 +1054,13 @@
                 </div>
                 <div class="col-md-12">
                     <div class="record-card">
+                        <label class="text-secondary mb-1"><i class="fa-solid fa-shield-haltered"></i> Código de Segurança</label>
+                        <p class="fw-bold mb-0">${profData.profKey ? '✅ Configurado' : '⚠️ Não configurado'}</p>
+                        <small class="text-muted">${profData.profKey ? 'Código definido' : 'Configure seu código de segurança'}</small>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="record-card">
                         <label class="text-secondary mb-1"><i class="fa-solid fa-calendar"></i> Data de Registo</label>
                         <p class="fw-bold mb-0">${profData.createdAt ? new Date(profData.createdAt).toLocaleDateString() : 'N/A'}</p>
                     </div>
@@ -857,8 +1070,13 @@
     }
 
     document.getElementById('btnEditarInfo')?.addEventListener('click', async () => {
+        if (!profData) return;
+
+        const senhaValida = await verificarSenhaSegurancaProfessor('editar suas informações pessoais');
+        if (!senhaValida) return;
+
         const { value: formValues } = await Swal.fire({
-            title: 'Editar Informações',
+            title: '<i class="fa-regular fa-pen-to-square"></i> Editar Informações',
             html: `
                 <div class="mb-3 text-start">
                     <label class="form-label">Nome Completo</label>
@@ -882,7 +1100,9 @@
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: 'Salvar',
+            confirmButtonText: '<i class="fa-solid fa-save"></i> Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark"></i> Cancelar',
+            width: '600px',
             preConfirm: () => {
                 return {
                     nome: document.getElementById('editNome').value,
@@ -895,17 +1115,11 @@
         });
         
         if (formValues) {
-            await update(ref(db, `professores/${currentUser.uid}`), {
-                nome: formValues.nome,
-                email: formValues.email,
-                telefone: formValues.telefone,
-                morada: formValues.morada,
-                bi: formValues.bi
-            });
+            await update(ref(db, `professores/${currentUser.uid}`), formValues);
             profData = { ...profData, ...formValues };
             renderMinhasInformacoes();
             updateUI();
-            Swal.fire('Sucesso!', 'Informações atualizadas', 'success');
+            Swal.fire('✅ Sucesso!', 'Informações atualizadas', 'success');
         }
     });
 
@@ -990,6 +1204,11 @@
         let turma = document.getElementById('selectTurma').value;
         let disc = document.getElementById('selectDisciplina').value;
         let trimestre = parseInt(document.getElementById('selectTrimestre').value);
+        
+        // Verificar segurança antes de salvar notas
+        const senhaValida = await verificarSenhaSegurancaProfessor('salvar notas');
+        if (!senhaValida) return;
+        
         let inputs = document.querySelectorAll('.nota-input');
         let salvas = 0;
         for (let inp of inputs) {
@@ -1035,6 +1254,11 @@
         let turma = document.getElementById('selectTurmaFreq').value;
         let disc = document.getElementById('selectDisciplinaFreq').value;
         let data = document.getElementById('selectDataFreq').value;
+        
+        // Verificar segurança antes de salvar frequência
+        const senhaValida = await verificarSenhaSegurancaProfessor('salvar frequência');
+        if (!senhaValida) return;
+        
         let updates = {};
         let ts = Date.now();
         for (let cb of document.querySelectorAll('.presenca-switch')) {
@@ -1052,33 +1276,86 @@
         Swal.fire('Salvo!', 'Frequência registrada', 'success');
     });
 
-    // Edit/Delete functions
+    // Edit/Delete functions with security
     window.editarNota = async (id, valorAtual) => {
-        let { value: nova } = await Swal.fire({ title: 'Editar nota', input: 'number', inputValue: valorAtual, inputAttributes: { min: 0, max: 20, step: 0.5 }, showCancelButton: true });
-        if (nova !== undefined && nova >= 0 && nova <= 20) { await update(ref(db, `notas/${id}`), { valor: parseFloat(nova) }); Swal.fire('Atualizado!'); }
+        const senhaValida = await verificarSenhaSegurancaProfessor('editar nota');
+        if (!senhaValida) return;
+        
+        let { value: nova } = await Swal.fire({ 
+            title: 'Editar nota', 
+            input: 'number', 
+            inputValue: valorAtual, 
+            inputAttributes: { min: 0, max: 20, step: 0.5 }, 
+            showCancelButton: true,
+            confirmButtonText: 'Salvar'
+        });
+        if (nova !== undefined && nova >= 0 && nova <= 20) { 
+            await update(ref(db, `notas/${id}`), { valor: parseFloat(nova) }); 
+            Swal.fire('Atualizado!');
+            renderRegistros();
+        }
     };
-    window.excluirItem = async (path, id) => {
-        let conf = await Swal.fire({ title: 'Excluir?', text: 'Não será possível reverter', icon: 'warning', showCancelButton: true });
-        if (conf.isConfirmed) { await remove(ref(db, `${path}/${id}`)); Swal.fire('Excluído!'); }
+
+    window.excluirNota = async (id) => {
+        await excluirItemComSeguranca('notas', id, 'nota');
+        renderRegistros();
+    };
+
+    window.excluirFalta = async (id) => {
+        await excluirItemComSeguranca('faltas', id, 'registro de falta');
+        renderRegistros();
+    };
+
+    // Funções de chat com segurança
+    window.editarMensagemAluno = async (msgId, textoAntigo) => {
+        const senhaValida = await verificarSenhaSegurancaProfessor('editar mensagem');
+        if (!senhaValida) return;
+
+        let { value: novoTexto } = await Swal.fire({
+            title: 'Editar mensagem',
+            input: 'textarea',
+            inputValue: textoAntigo,
+            inputPlaceholder: 'Digite a nova mensagem...',
+            showCancelButton: true,
+            confirmButtonText: 'Salvar'
+        });
+        if (novoTexto && novoTexto.trim()) {
+            await update(ref(db, `mensagensChatAlunos/${msgId}`), { texto: novoTexto.trim(), editado: true, editadoEm: Date.now() });
+            Swal.fire('Mensagem editada!', '', 'success');
+        }
+    };
+
+    window.excluirMensagemAluno = async (msgId) => {
+        await excluirItemComSeguranca('mensagensChatAlunos', msgId, 'mensagem');
     };
 
     function renderRegistros() {
         let minhasNotas = Object.entries(allNotas).filter(([id, n]) => n.professorId === currentUser.uid).sort((a, b) => b[1].timestamp - a[1].timestamp);
         document.getElementById('registrosNotasList').innerHTML = minhasNotas.length ? minhasNotas.map(([id, n]) => {
+            let alunoNome = Object.values(allAlunos).find(a => a.matricula === n.alunoId || a.id === n.alunoId)?.nome || n.alunoId;
             let trimestreTexto = n.trimestre ? `${n.trimestre}º Trimestre` : 'Trimestre não definido';
-            return `<div class="record-card"><div class="d-flex justify-content-between"><div><strong>${Object.values(allAlunos).find(a => a.matricula === n.alunoId || a.id === n.alunoId)?.nome || n.alunoId}</strong> • ${n.disciplina} • ${n.valor} pts (${n.tipo || 'Avaliação'})<br><small class="text-secondary">${trimestreTexto} - ${n.data || ''}</small></div><div><button class="btn-icon" onclick="window.editarNota('${id}', ${n.valor})"><i class="fa-regular fa-pen-to-square"></i></button> <button class="btn-icon" onclick="window.excluirItem('notas','${id}')"><i class="fa-regular fa-trash-can"></i></button></div></div></div>`;
-        }).join('') : '<p class="text-center">Nenhuma nota</p>';
+            return `<div class="record-card"><div class="d-flex justify-content-between align-items-start flex-wrap"><div><strong>${alunoNome}</strong> • ${n.disciplina} • <span class="badge-modern">${n.valor} pts</span><br><small class="text-secondary">${trimestreTexto} - ${n.tipo || 'Avaliação'} - ${n.data || ''}</small></div><div><button class="btn-icon" onclick="window.editarNota('${id}', ${n.valor})"><i class="fa-regular fa-pen-to-square"></i></button> <button class="btn-icon" onclick="window.excluirNota('${id}')"><i class="fa-regular fa-trash-can" style="color: var(--danger);"></i></button></div></div></div>`;
+        }).join('') : '<div class="text-center p-4 text-secondary">Nenhuma nota registrada</div>';
         
         let minhasFaltas = Object.entries(allFaltas).filter(([id, f]) => f.professorId === currentUser.uid).sort((a, b) => b[1].timestamp - a[1].timestamp);
-        document.getElementById('registrosFaltasList').innerHTML = minhasFaltas.length ? minhasFaltas.map(([id, f]) => `<div class="record-card"><div><strong>${Object.values(allAlunos).find(a => a.matricula === f.alunoId)?.nome || f.alunoId}</strong> • Falta em ${f.data} - ${f.disciplina}</div><div class="small">Obs: ${f.observacao || '--'}</div><div class="mt-2"><button class="btn-icon" onclick="window.excluirItem('faltas','${id}')">Excluir</button></div></div>`).join('') : '<p class="text-center">Nenhuma falta</p>';
+        document.getElementById('registrosFaltasList').innerHTML = minhasFaltas.length ? minhasFaltas.map(([id, f]) => {
+            let alunoNome = Object.values(allAlunos).find(a => a.matricula === f.alunoId || a.id === f.alunoId)?.nome || f.alunoId;
+            return `<div class="record-card"><div class="d-flex justify-content-between align-items-start flex-wrap"><div><strong>${alunoNome}</strong> • <span class="badge-danger">Falta</span> em ${f.data} - ${f.disciplina}<br><small class="text-secondary">Obs: ${f.observacao || '--'}</small></div><div><button class="btn-icon" onclick="window.excluirFalta('${id}')"><i class="fa-regular fa-trash-can" style="color: var(--danger);"></i></button></div></div></div>`;
+        }).join('') : '<div class="text-center p-4 text-secondary">Nenhuma falta registrada</div>';
     }
 
-    document.getElementById('tabNotasReg')?.addEventListener('click', () => { document.getElementById('registrosNotasList').style.display = 'block'; document.getElementById('registrosFaltasList').style.display = 'none'; });
-    document.getElementById('tabFaltasReg')?.addEventListener('click', () => { document.getElementById('registrosNotasList').style.display = 'none'; document.getElementById('registrosFaltasList').style.display = 'block'; });
+    document.getElementById('tabNotasReg')?.addEventListener('click', () => { 
+        document.getElementById('registrosNotasList').style.display = 'block'; 
+        document.getElementById('registrosFaltasList').style.display = 'none'; 
+    });
+    document.getElementById('tabFaltasReg')?.addEventListener('click', () => { 
+        document.getElementById('registrosNotasList').style.display = 'none'; 
+        document.getElementById('registrosFaltasList').style.display = 'block'; 
+    });
 
     function renderMeusAlunos() {
         let alunos = Object.values(allAlunos).filter(a => a.turma === profData?.turmaNome && a.status === 'Ativo');
-        document.getElementById('meusAlunosList').innerHTML = alunos.length ? alunos.map(aluno => `<div class="student-list-item" onclick="window.verBoletim('${Object.keys(allAlunos).find(k => allAlunos[k] === aluno)}')"><span><i class="fa-regular fa-circle-user me-2"></i> ${aluno.nome}</span><i class="fa-solid fa-chevron-right"></i></div>`).join('') : '<div class="text-center p-4">Nenhum aluno vinculado</div>';
+        document.getElementById('meusAlunosList').innerHTML = alunos.length ? alunos.map(aluno => `<div class="student-list-item" onclick="window.verBoletim('${Object.keys(allAlunos).find(k => allAlunos[k] === aluno)}')"><span><i class="fa-regular fa-circle-user me-2"></i> ${aluno.nome}</span><i class="fa-solid fa-chevron-right"></i></div>`).join('') : '<div class="text-center p-4 text-secondary">Nenhum aluno vinculado</div>';
     }
 
     window.verBoletim = (alunoId) => {
@@ -1092,12 +1369,12 @@
         let media = cont > 0 ? soma / cont : 0;
         let situacao = media >= 10 ? 'Aprovado' : media === 9 ? 'Recuperação' : 'Reprovado';
         let faltas = Object.values(allFaltas).filter(f => f.alunoId === alunoId && f.disciplina === disc).length;
-        Swal.fire({ title: `📘 ${aluno.nome}`, html: `<div class="text-start"><p><strong>Matrícula:</strong> ${aluno.matricula}</p><p><strong>Turma:</strong> ${aluno.turma}</p><hr><p>Notas: 1T:${notas[1] ?? '-'} | 2T:${notas[2] ?? '-'} | 3T:${notas[3] ?? '-'}</p><p>Média: ${media.toFixed(1)} - ${situacao}</p><p>Faltas: ${faltas}</p></div>`, icon: situacao === 'Aprovado' ? 'success' : 'info' });
+        Swal.fire({ title: `<i class="fa-solid fa-user-graduate"></i> ${aluno.nome}`, html: `<div class="text-start"><p><strong>Matrícula:</strong> ${aluno.matricula}</p><p><strong>Turma:</strong> ${aluno.turma}</p><hr><p>Notas: 1T:${notas[1] ?? '-'} | 2T:${notas[2] ?? '-'} | 3T:${notas[3] ?? '-'}</p><p><strong>Média:</strong> ${media.toFixed(1)} - <span class="${situacao === 'Aprovado' ? 'badge-success' : situacao === 'Recuperação' ? 'badge-warning' : 'badge-danger'}">${situacao}</span></p><p><strong>Faltas:</strong> ${faltas}</p></div>`, icon: situacao === 'Aprovado' ? 'success' : 'info' });
     };
 
     function renderProfessoresList() {
         let profs = Object.entries(allProfessores).filter(([id, p]) => p.id !== currentUser.uid);
-        document.getElementById('professoresList').innerHTML = profs.length ? profs.map(([id, p]) => `<div class="professor-item-card" onclick="Swal.fire({ title: '${p.nome}', html: '<div class=\"text-start\"><p><strong>Disciplina:</strong> ${p.disciplinaNome || p.disciplina}</p><p><strong>Turma:</strong> ${p.turmaNome || 'N/A'}</p><p><strong>Email:</strong> ${p.email || 'N/A'}</p></div>' })"><div><strong>${p.nome}</strong><br><small>${p.disciplinaNome || p.disciplina}</small></div></div>`).join('') : '<div class="text-center p-4">Nenhum professor encontrado</div>';
+        document.getElementById('professoresList').innerHTML = profs.length ? profs.map(([id, p]) => `<div class="professor-item-card" onclick="Swal.fire({ title: '${p.nome}', html: '<div class=\"text-start\"><p><strong>Disciplina:</strong> ${p.disciplinaNome || p.disciplina}</p><p><strong>Turma:</strong> ${p.turmaNome || 'N/A'}</p><p><strong>Email:</strong> ${p.email || 'N/A'}</p><p><strong>Vínculo:</strong> ${p.tipoVinculo === 'titular' ? 'Titular' : 'Substituto'}</p></div>' })"><div><strong>${p.nome}</strong><br><small>${p.disciplinaNome || p.disciplina}</small></div></div>`).join('') : '<div class="text-center p-4 text-secondary">Nenhum professor encontrado</div>';
     }
 
     // Chat com Alunos
@@ -1154,8 +1431,8 @@
                         <div class="message-meta">
                             <span>${time}</span>
                             ${isSent ? `<div class="message-actions">
-                                <button class="message-action-btn" onclick="window.editarMensagemAluno('${id}', '${escapeHtml(msg.texto)}')"><i class="fa-regular fa-pen-to-square"></i> Editar</button>
-                                <button class="message-action-btn" onclick="window.excluirMensagemAluno('${id}')"><i class="fa-regular fa-trash-can"></i> Excluir</button>
+                                <button class="message-action-btn" onclick="window.editarMensagemAluno('${id}', '${escapeHtml(msg.texto)}')"><i class="fa-regular fa-pen-to-square"></i></button>
+                                <button class="message-action-btn" onclick="window.excluirMensagemAluno('${id}')"><i class="fa-regular fa-trash-can" style="color: var(--danger);"></i></button>
                             </div>` : ''}
                         </div>
                     </div>
@@ -1164,29 +1441,6 @@
         }).join('');
         container.scrollTop = container.scrollHeight;
     }
-
-    window.editarMensagemAluno = async (msgId, textoAntigo) => {
-        let { value: novoTexto } = await Swal.fire({
-            title: 'Editar mensagem',
-            input: 'textarea',
-            inputValue: textoAntigo,
-            inputPlaceholder: 'Digite a nova mensagem...',
-            showCancelButton: true,
-            confirmButtonText: 'Salvar'
-        });
-        if (novoTexto && novoTexto.trim()) {
-            await update(ref(db, `mensagensChatAlunos/${msgId}`), { texto: novoTexto.trim(), editado: true, editadoEm: Date.now() });
-            Swal.fire('Mensagem editada!', '', 'success');
-        }
-    };
-
-    window.excluirMensagemAluno = async (msgId) => {
-        let conf = await Swal.fire({ title: 'Excluir mensagem?', text: 'Não será possível recuperar', icon: 'warning', showCancelButton: true });
-        if (conf.isConfirmed) {
-            await remove(ref(db, `mensagensChatAlunos/${msgId}`));
-            Swal.fire('Mensagem excluída!', '', 'success');
-        }
-    };
 
     document.getElementById('btnSendChatAlunos')?.addEventListener('click', async () => {
         let texto = document.getElementById('chatAlunosInput').value.trim();
